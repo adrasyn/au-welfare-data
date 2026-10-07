@@ -1,5 +1,5 @@
 export const welfareScopes=[
-  {id:'all',label:'All selected welfare',description:'All programmes included in this data release. Programme groups describe the purpose of support, not recipients’ ages.'},
+  {id:'all',label:'All welfare',description:'All programmes included in this data release. Programme groups describe the purpose of support, not recipients’ ages.'},
   {id:'working',label:'Working-age & family support',description:'JobSeeker, Youth Allowance, family support, disability support and Carer Payment. These programmes can also support older people; this is not a count of working-age recipients.'},
   {id:'retirement',label:'Retirement & aged care',description:'Age Pension and the aged-care services included in this release. Some aged-care users are younger people. These are programme groups, not recipient age bands.'}
 ];

@@ -31,10 +31,10 @@ export async function exportGraphic(summary,style,format,canonicalOrigin) {
       const page=document.createElement('canvas');page.width=canvas.width;page.height=slice.height;
       page.getContext('2d').drawImage(canvas,0,slice.start,canvas.width,slice.height,0,0,canvas.width,slice.height);
       doc.addImage(page.toDataURL('image/png'),'PNG',6,6,width,width*slice.height/canvas.width,undefined,'FAST');
-      doc.setFontSize(8);doc.text(`${summary.area.name} · ${summary.scope?.label??'All selected welfare'} · ${index+1}/${slices.length}`,6,pageHeight-2);
+      doc.setFontSize(8);doc.text(`${summary.area.name} · ${summary.scope?.label??'All welfare'} · ${index+1}/${slices.length}`,6,pageHeight-2);
     }
   }
-  doc.setProperties({title:`${summary.area.name} welfare ${style} — ${summary.scope?.label??'All selected welfare'}`,subject:`Recipients and estimated programme spending, ${summary.financialYear}`,author:'Welfare Data Australia'});
+  doc.setProperties({title:`${summary.area.name} welfare ${style} — ${summary.scope?.label??'All welfare'}`,subject:`Recipients and estimated programme spending, ${summary.financialYear}`,author:'Welfare Data Australia'});
   return doc.output('blob');
 }
 export function saveBlob(blob,filename,link) {

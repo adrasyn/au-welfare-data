@@ -8,7 +8,7 @@ export function socialPreview(summary,origin) {
   const available=summary.perResidentAvailable&&Number.isFinite(summary.totalPerResident.value);
   const amount=available?formatAUD(summary.totalPerResident.value):'Unavailable';
   const metric=!available?'Per-person spending unavailable':summary.incomplete?'Known annual spending per person · incomplete':'Estimated annual spending per person';
-  const scope=summary.scope?.label??'All selected welfare',period=`FY${summary.financialYear.replace('-','–')}`;
+  const scope=summary.scope?.label??'All welfare',period=`FY${summary.financialYear.replace('-','–')}`;
   const geography=`${summary.area.type==='ced'?'Federal division':'Council area'} · ${summary.area.state}`;
   const excluded=summary.groups.some(group=>group.id==='aged-care-residential'&&group.additive===false);
   const grossOverlap=summary.groups.some(group=>group.overlapPolicy==='include-gross')&&summary.groups.some(group=>group.id==='ndis');

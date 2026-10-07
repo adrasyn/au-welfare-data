@@ -9,7 +9,7 @@ export function documentContent(summary,style) {
   const receipt=style==='receipt';
   return {
     title:receipt?'Welfare receipt, per person':'Welfare invoice',
-    scopeLabel:summary.scope?.label??'All selected welfare',
+    scopeLabel:summary.scope?.label??'All welfare',
     area:summary.area.name,
     geography:`${summary.area.type==='ced'?'Federal electorate':'Council area'} · ${summary.area.state}`,
     period:`Financial year ${summary.financialYear.replace('-','–')}`,
