@@ -83,6 +83,12 @@
       <aside id="document-panel" class="document-panel" aria-labelledby="preview-title">
         <div class="preview-heading"><h2 id="preview-title">Your download</h2><span id="preview-detail">Choose an area to begin</span></div>
         <div class="style-tabs" role="group" aria-label="Document style"><button id="receipt-tab" type="button" data-style="receipt" aria-pressed="true">Receipt <span>Per resident</span></button><button id="invoice-tab" type="button" data-style="invoice" aria-pressed="false">Invoice <span>Area spending</span></button></div>
+        <div class="document-actions">
+          <div class="downloads"><button id="download-png" class="primary" type="button" disabled><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download PNG</button><button id="download-pdf" class="secondary" type="button" disabled>Download PDF</button></div>
+          <div class="document-tools"><button id="copy-link" type="button" class="text-button" disabled>Copy area link</button><button id="print" type="button" class="text-button" disabled>Print</button></div>
+          <p id="download-status" class="status" role="status" aria-live="polite"></p>
+          <a id="save-file" class="save-file" hidden>Save prepared file</a>
+        </div>
         <div id="preview-frame" class="preview-frame">
           <div id="empty-preview" class="empty-preview">
             <div class="empty-receipt" aria-hidden="true"><span>Welfare Data<br>Australia</span><div></div><i></i><i></i><i></i><i></i><i></i><b></b><div></div><small>Your area. Your figures.</small></div>
@@ -92,10 +98,6 @@
         </div>
         <p id="preview-caption" class="preview-caption">A shareable summary, with the sources included.</p>
         <details id="document-text" class="document-text" hidden><summary id="document-text-label">Read this receipt as text</summary><div id="document-text-content"></div></details>
-        <div class="downloads"><button id="download-png" class="primary" type="button" disabled><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download PNG</button><button id="download-pdf" class="secondary" type="button" disabled>Download PDF</button></div>
-        <div class="document-tools"><button id="copy-link" type="button" class="text-button" disabled>Copy area link</button><button id="print" type="button" class="text-button" disabled>Print</button></div>
-        <p id="download-status" class="status" role="status" aria-live="polite"></p>
-        <a id="save-file" class="save-file" hidden>Save prepared file</a>
       </aside>
     </div>
     <section id="rankings" class="rankings-section" aria-labelledby="rankings-title">
