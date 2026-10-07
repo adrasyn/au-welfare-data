@@ -30,7 +30,8 @@ export function documentContent(summary,style) {
     totalLabel:summary.totalLabel,
     footer:[
       'Local spending is estimated from national expenditure and recipient shares.',
-      'Rent Assistance is shown for context and not added to the subtotal; it overlaps primary payment expenditure.',
+      'Rent Assistance helps eligible renters receiving a qualifying payment. It is not added to the subtotal because government expenditure already includes it within primary payments; adding it again would double count spending.',
+      'The Rent Assistance estimate also covers programmes outside this selection; it is not an exact breakdown of the rows above.',
       'Counts can overlap. FTB counts cover instalment families; NDIS council conversions are estimated where boundaries change.',
       'Recipient rates use the dated population. Families and income units are per 1,000 residents, not percentages of people.',
       receipt?'AUD per resident, rounded to whole dollars.':'AUD, rounded to the nearest $1,000.',
