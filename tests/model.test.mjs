@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildSummary, formatCount, formatAUD } from '../dist/lib/model.mjs';
-const count=(value,unit='people',label='People')=>({value,unit,label,status:'reported',period:'2025-06-30'});
-const group=(id,value,extra={})=>({id,label:id,counts:[count(10)],spending:{value,status:'estimated',unit:'AUD'},financialYear:'2024-25',additive:true,...extra});
+const count=(value,unit='people',label='People')=>({value,unit,label,status:'reported',period:'2025-06-30',geographyVintage:'LGA2024'});
+const group=(id,value,extra={})=>({id,label:id,counts:[count(10)],spending:{value,status:'estimated',unit:'AUD',period:'2024-25',geographyVintage:'LGA2024'},financialYear:'2024-25',allocationCountDate:'2025-06-30',additive:true,...extra});
 const area=groups=>({id:'lga:test',name:'Test',type:'lga',geographyVintage:'LGA2024',population:{value:100,status:'reported',geographyVintage:'LGA2024',period:'2024-06-30'},groups});
 
 test('totals use unrounded monetary values before display rounding',()=>{
@@ -50,4 +50,24 @@ test('geographically allocated counts display as estimates',()=>{
 test('true zero is displayed, while a missing value is unavailable',()=>{
   assert.equal(formatAUD(0),'$0');
   assert.equal(formatAUD(null),'Unavailable');
+});
+test('count geography mismatch withholds that payment estimate and explains it',()=>{
+  const payment=group('ndis',500);payment.counts[0].geographyVintage='LGA2025';
+  const result=buildSummary(area([group('job',1000),payment]));
+  assert.equal(result.groups[1].spending.value,null);
+  assert.equal(result.groups[1].counts[0].value,null);
+  assert.match(result.issues?.join(' ')??'',/geograph/i);
+  assert.equal(result.total.value,1000);
+});
+test('spending period is checked independently of the group year',()=>{
+  const payment=group('ndis',500);payment.spending.period='2023-24';
+  const result=buildSummary(area([group('job',1000),payment]));
+  assert.equal(result.groups[1].spending.value,null);
+  assert.match(result.issues?.join(' ')??'',/period|year/i);
+});
+test('a count-date mismatch prevents using an incompatible allocation numerator',()=>{
+  const payment=group('ndis',500);payment.counts[0].period='2025-03-31';
+  const result=buildSummary(area([payment]));
+  assert.equal(result.groups[0].spending.value,null);
+  assert.match(result.issues?.join(' ')??'',/date|snapshot/i);
 });

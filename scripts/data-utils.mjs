@@ -1,9 +1,16 @@
+import { allocationIssues } from '../dist/lib/model.mjs';
+
 export function validateRelease(release) {
   const ids = new Set();
   for (const area of release.areas) {
     if (ids.has(area.id)) throw new Error(`Duplicate area ${area.id}`);
     ids.add(area.id);
     for (const group of area.groups ?? []) {
+      if(group.spending) {
+        const issues=allocationIssues(group,area,release);
+        if(issues.length) throw new Error(`${area.id} ${group.id}: ${issues.join('; ')}`);
+        if(group.components?.length && group.spending.value!==null && Math.abs(group.components.reduce((sum,c)=>sum+c.spending.value,0)-group.spending.value)>0.001) throw new Error('Component expenditure does not reconcile');
+      }
       for (const count of group.counts ?? []) {
         if (['suppressed','unavailable'].includes(count.status) && count.value !== null) throw new Error('Suppressed/unavailable observations cannot contain an exact value');
         if (count.value !== null && (!Number.isFinite(count.value) || count.value < 0)) throw new Error('Invalid count');

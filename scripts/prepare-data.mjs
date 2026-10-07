@@ -71,17 +71,22 @@ function observation(raw,unit,label) {
   return {...parseCount(raw,unit),label,period:snapshot,sourceId:'dss-june2025'};
 }
 function groupFor(spec,row,ndisCount,type) {
-  let counts, value;
+  let counts, value, components=[];
+  const geographyVintage=`${type.toUpperCase()}2024`;
   if(spec.id==='ndis') {
     const count=ndisCount??parseCount(null,'participants');
     counts=[{...count,label:'Participants',period:snapshot,sourceId:'ndis-june2025',geographyVintage:type==='lga'?'LGA2024':'CED2024',method:type==='lga'?'ABS LGA2020 → LGA2024 correspondences':'Published CED2024 count'}];
     value=count.value===null?null:count.value/ndisNational*ndisExpenditure;
   } else {
-    counts=spec.components.map(([field,label,,unit])=>observation(row?.[field],unit,label));
-    value=counts.some(c=>c.value===null)?null:spec.components.reduce((sum,[field,,amount],i)=>sum+amount*1e6*counts[i].value/national[field],0);
+    counts=spec.components.map(([field,label,,unit])=>({...observation(row?.[field],unit,label),geographyVintage}));
+    components=spec.components.map(([field,label,amount],i)=>{
+      const value=counts[i].value===null?null:amount*1e6*counts[i].value/national[field];
+      return {label,count:counts[i],spending:{value,status:value===null?'unavailable':'estimated',unit:'AUD',period:fiscal,geographyVintage}};
+    });
+    value=counts.some(c=>c.value===null)?null:components.reduce((sum,c)=>sum+c.spending.value,0);
   }
-  return {id:spec.id,label:spec.label,short:spec.short,description:spec.description,counts,
-    spending:{value,status:value===null?'unavailable':'estimated',unit:'AUD',period:fiscal},financialYear:fiscal,
+  return {id:spec.id,label:spec.label,short:spec.short,description:spec.description,counts,components,
+    spending:{value,status:value===null?'unavailable':'estimated',unit:'AUD',period:fiscal,geographyVintage},financialYear:fiscal,allocationCountDate:snapshot,
     additive:!spec.nonAdditive,overlapHandled:spec.id==='cra',includesRentAssistance:spec.id!=='ndis'&&spec.id!=='cra'};
 }
 const areas=[];

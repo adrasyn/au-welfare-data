@@ -1,4 +1,4 @@
-import { buildSummary, formatAUD, formatCount } from './lib/model.mjs';
+import { buildSummary, formatAUD, formatCount, formatSourceDate } from './lib/model.mjs';
 import { searchAreas, resolveAreaUrl } from './lib/search.mjs';
 import { documentContent, areaLink, exportFilename } from './lib/render.mjs';
 import { previewGraphic, exportGraphic, saveBlob } from './lib/download.mjs';
@@ -24,6 +24,9 @@ async function loadData(current=false) {
     const response=await fetch(`/data/releases/${version}.json`);
     if(!response.ok) throw new Error('That data release could not be loaded. Load current data or try again.');
     release=await response.json();
+    $('financial-year').textContent=`Financial year ${release.financialYear.replace('-','–')}`;
+    $('recipient-date').textContent=`Recipients at ${formatSourceDate(release.countDate)}`;
+    $('spending-year').textContent=`Estimated spend in ${release.financialYear.replace('-','–')}`;
     $('area-search').disabled=false;$('search-button').disabled=false;
     status('search-status','');
     for(const key of ['allocation','counts','geography','overlap','population']) $(`method-${key}`).textContent=release.methodology[key];
@@ -58,8 +61,10 @@ async function selectArea(area,moveFocus=true) {
   $('area-summary').hidden=false;
   $('area-name').textContent=area.name;
   $('area-type').textContent=`${area.type==='ced'?'Federal electorate':'Council area'} · ${area.state}`;
-  $('area-population').textContent=`${area.population.value.toLocaleString('en-AU')} residents · ABS June 2024`;
-  $('payment-list').innerHTML=summary.groups.map(group=>`<li class="payment-row"><div class="payment-name">${escape(group.label)}<details><summary>About this payment</summary><p>${escape(group.description)}</p></details></div><div class="counts">${group.counts.map(c=>`<div>${!['People','Participants'].includes(c.label)?`<span class="count-label">${escape(c.label)}</span>`:''}<strong>${escape(formatCount(c))}</strong></div>`).join('')}</div><div class="payment-money">${escape(formatAUD(group.spending.value,{compact:true}))}${group.additive===false?'<small>Not added to subtotal</small>':''}</div></li>`).join('');
+  $('area-population').textContent=summary.perResidentAvailable?`${area.population.value.toLocaleString('en-AU')} residents · ABS ${formatSourceDate(summary.populationDate)}`:'Compatible resident population unavailable. Area spending and recipient counts are shown below.';
+  $('payment-list').innerHTML=summary.groups.map(group=>`<li class="payment-row"><div class="payment-name">${escape(group.label)}<details><summary>About this payment</summary><p>${escape(group.description)}</p>${group.components?.length>1?`<ul class="component-spending">${group.components.map(c=>`<li>${escape(c.label)}: ${escape(formatAUD(c.spending.value,{roundTo:1000}))} estimated annual spend</li>`).join('')}</ul>`:''}</details></div><div class="counts">${group.counts.map(c=>`<div>${!['People','Participants'].includes(c.label)?`<span class="count-label">${escape(c.label)}</span>`:''}<strong>${escape(formatCount(c))}</strong></div>`).join('')}</div><div class="payment-money">${escape(formatAUD(group.spending.value,{compact:true}))}${group.additive===false?'<small>Not added to subtotal</small>':''}</div></li>`).join('');
+  $('data-issues').hidden=!summary.issues.length;
+  $('data-issues').innerHTML=summary.issues.map(issue=>`<li>${escape(issue)}</li>`).join('');
   $('subtotal-label').textContent=summary.totalLabel;
   $('subtotal-money').textContent=formatAUD(summary.total.value,{compact:true});
   $('incomplete-note').hidden=!summary.incomplete;
@@ -78,11 +83,15 @@ async function updatePreview() {
   $('empty-preview').hidden=true;$('graphic').hidden=false;
   $('preview-caption').textContent=style==='receipt'?'Annual spending per resident, with local recipient counts.':'Annual spending for the whole area, with local recipient counts.';
   $('view-document').textContent=`View and download your ${style}`;
+  const content=documentContent(summary,style);
+  $('document-text').hidden=false;
+  $('document-text-content').innerHTML=`<h3>${escape(content.area)} — ${escape(content.title)}</h3><p>${escape(content.geography)}<br>${escape(content.period)}<br>${escape(content.countDate)}<br>${escape(content.populationDate)}</p><p><strong>${escape(content.unit)}</strong></p><ul class="document-text-rows">${content.rows.map(row=>`<li><strong>${escape(row.label)}: ${escape(row.money)}</strong><span>${row.countLines.map(escape).join('<br>')}</span>${row.nonAdditive?'<small>Not added to subtotal</small>':''}</li>`).join('')}</ul><p><strong>${escape(content.totalLabel)}: ${escape(content.total)}</strong></p>${content.footer.map(note=>`<p>${escape(note)}</p>`).join('')}<p><a href="${escape(areaLink(summary,canonicalOrigin))}">View this area and its sources</a> · Release ${escape(summary.releaseId)}</p>`;
   try {
     const canvas=await previewGraphic(summary,style,canonicalOrigin);
     if(version!==previewVersion) return;
     const image=new Image();image.src=canvas.toDataURL('image/png');
-    image.alt=`${selected.name} benefits ${style}. The same counts and spending are listed in the area summary.`;
+    image.alt=`${selected.name} benefits ${style}. Full figures are available in “Read this ${style} as text” below.`;
+    image.setAttribute('aria-details','document-text');
     $('graphic').replaceChildren(image);
     canvas.width=1;canvas.height=1;
   } catch(error) {status('download-status','The preview could not be generated. Choose the other format or try again.',true);}
@@ -90,6 +99,7 @@ async function updatePreview() {
 function setStyle(value) {
   clearDownload();
   style=value;
+  $('document-text-label').textContent=`Read this ${style} as text`;
   for(const button of document.querySelectorAll('[data-style]'))button.setAttribute('aria-pressed',String(button.dataset.style===style));
   updatePreview();
 }

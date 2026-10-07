@@ -14,3 +14,11 @@ main{max-width:1200px;margin:auto;padding:0 32px}.intro{display:flex;align-items
 @media(max-width:350px){main{padding:0 15px}.site-header{padding:18px 15px}.intro h1{font-size:32px}.search-control{padding-left:9px;gap:7px}.search-control>svg{display:none}.document-panel{padding:13px}.downloads{gap:7px}.downloads button{font-size:11px}.downloads svg{display:none}.payment-row{gap:6px 14px}.payment-money{font-size:13px}.summary-caption{display:block}.summary-caption span{display:block}.summary-caption span+span{margin-top:3px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}button{transition:none}}
 @media print{.site-header,.intro,.explorer,.style-tabs,.downloads,.document-tools,.about-data,.site-footer,.preview-heading,.preview-caption,.status,.save-file{display:none!important}main{padding:0}.workspace{display:block}.document-panel{position:static;border:0;background:white;padding:0;max-width:none}.preview-frame{max-height:none;overflow:visible;padding:0}#graphic img{box-shadow:none;width:100%;max-height:270mm;object-fit:contain}}
+:root .document-text {font-size:.85rem;margin:0 0 1.25rem;overflow-wrap:anywhere}
+.document-text summary {cursor:pointer;padding:.5rem 0;text-decoration:underline;text-underline-offset:3px}
+.document-text h3 {font-size:1rem}
+.document-text-rows {list-style:none;padding:0}
+.document-text-rows li {border-bottom:1px solid #ddd;padding:.75rem 0}
+.document-text-rows span,.document-text-rows small {display:block;margin-top:.25rem}
+.component-spending {padding-left:1rem}
+.payment-name .component-spending li {margin:.5rem 0}

@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import { buildSummary } from '../dist/lib/model.mjs';
 import { documentContent, exportFilename, areaLink } from '../dist/lib/render.mjs';
 const summary=buildSummary({id:'ced:101',name:'Banks',state:'NSW',type:'ced',geographyVintage:'CED2024',population:{value:1000,period:'2024-06-30',geographyVintage:'CED2024'},groups:[
-  {id:'ftb',label:'Family Tax Benefit',short:'Family Tax Benefit',financialYear:'2024-25',additive:true,spending:{value:1234567,status:'estimated'},counts:[
-    {label:'Part A',value:100,status:'reported',unit:'families'},
-    {label:'Part B',value:80,status:'reported',unit:'families'}
+  {id:'ftb',label:'Family Tax Benefit',short:'Family Tax Benefit',financialYear:'2024-25',allocationCountDate:'2025-06-30',additive:true,spending:{value:1234567,status:'estimated',unit:'AUD',period:'2024-25',geographyVintage:'CED2024'},counts:[
+    {label:'Part A',value:100,status:'reported',unit:'families',period:'2025-06-30',geographyVintage:'CED2024'},
+    {label:'Part B',value:80,status:'reported',unit:'families',period:'2025-06-30',geographyVintage:'CED2024'}
   ]},
-  {id:'cra',label:'Rent Assistance',financialYear:'2024-25',additive:false,spending:{value:10000,status:'estimated'},counts:[{label:'Recipient households',value:20,status:'reported',unit:'income-units'}]}
+  {id:'cra',label:'Rent Assistance',financialYear:'2024-25',allocationCountDate:'2025-06-30',additive:false,spending:{value:10000,status:'estimated',unit:'AUD',period:'2024-25',geographyVintage:'CED2024'},counts:[{label:'Recipient households',value:20,status:'reported',unit:'income-units',period:'2025-06-30',geographyVintage:'CED2024'}]}
 ]},{id:'2024-25-v1',countDate:'2025-06-30'});
 test('both document styles preserve every source count and its unit',()=>{
   for(const style of ['receipt','invoice']) {
@@ -29,4 +29,10 @@ test('QR area links pin both stable identity and data release',()=>{
 });
 test('download names include area geography, name, style and release',()=>{
   assert.equal(exportFilename(summary,'invoice','pdf'),'benefits-ced-banks-invoice-2024-25-v1.pdf');
+});
+test('export dates follow their actual source metadata rather than fixed labels',()=>{
+  const dated={...summary,countDate:'2024-03-31',populationDate:'2023-06-30'};
+  const content=documentContent(dated,'receipt');
+  assert.match(content.countDate,/March 2024/);
+  assert.match(content.populationDate,/June 2023/);
 });

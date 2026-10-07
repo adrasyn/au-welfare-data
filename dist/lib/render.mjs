@@ -1,4 +1,4 @@
-import { formatAUD, formatCount } from './model.mjs';
+import { formatAUD, formatCount, formatSourceDate } from './model.mjs';
 
 export function areaLink(summary,origin) {
   const url=new URL('/',origin);
@@ -17,13 +17,13 @@ export function documentContent(summary,style) {
     area:summary.area.name,
     geography:`${summary.area.type==='ced'?'Federal electorate':'Council area'} · ${summary.area.state}`,
     period:`Financial year ${summary.financialYear.replace('-','–')}`,
-    countDate:'Recipient snapshot: June 2025',
-    populationDate:'Resident population: June 2024',
+    countDate:`Recipient snapshot: ${formatSourceDate(summary.countDate)}`,
+    populationDate:`Resident population: ${formatSourceDate(summary.populationDate)}`,
     unit:receipt?'Estimated annual spending per resident':'Estimated annual programme spending',
     rows:summary.groups.map(group=>({label:group.short??group.label,
       countLines:group.counts.map(count=>`${['People','Participants'].includes(count.label)?'':count.label+': '}${formatCount(count)}`),
       money:formatAUD((receipt?group.perResident:group.spending).value,{roundTo:receipt?1:1000}),
-      nonAdditive:group.additive===false,unavailable:group.spending.value===null})),
+      nonAdditive:group.additive===false,unavailable:group.spending.value===null,issues:group.issues??[]})),
     total:formatAUD((receipt?summary.totalPerResident:summary.total).value,{roundTo:receipt?1:1000}),
     totalLabel:summary.totalLabel,
     footer:[
@@ -31,6 +31,7 @@ export function documentContent(summary,style) {
       'Rent Assistance is shown for context and not added to the subtotal; it overlaps primary payment expenditure.',
       'Counts can overlap. FTB counts cover instalment families; NDIS council conversions are estimated where boundaries change.',
       receipt?'AUD per resident, rounded to whole dollars.':'AUD, rounded to the nearest $1,000.',
+      ...(summary.issues??[]),
       'Sources: DSS, NDIA, ABS and Productivity Commission. Scan for data, dates and full methodology.'
     ]
   };

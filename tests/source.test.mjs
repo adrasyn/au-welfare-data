@@ -17,3 +17,13 @@ test('regional council counts match independently checked source cells',()=>{
   assert.equal(area.groups.find(g=>g.id==='age').counts[0].value,2980);
   assert.equal(area.groups.find(g=>g.id==='carer').counts[0].value,420);
 });
+test('FTB component expenditure remains available and reconciles before rounding',()=>{
+  const ftb=release.areas.find(a=>a.id==='ced:141').groups.find(g=>g.id==='ftb');
+  assert.deepEqual(ftb.components?.map(c=>c.label),['Part A','Part B']);
+  assert.ok(Math.abs(ftb.components.reduce((sum,c)=>sum+c.spending.value,0)-ftb.spending.value)<0.001);
+});
+test('snapshot validation rejects incompatible payment metadata',()=>{
+  const record=structuredClone(release.areas.find(a=>a.id==='ced:141'));
+  record.groups.find(g=>g.id==='ndis').spending.period='2023-24';
+  assert.throws(()=>validateRelease({...release,areas:[record]}),/period|year/i);
+});
