@@ -151,7 +151,7 @@ async function updatePreview() {
     const canvas=await previewGraphic(summary,style,canonicalOrigin);
     if(version!==previewVersion) return;
     const image=new Image();image.src=canvas.toDataURL('image/png');
-    image.alt=`${selected.name} benefits ${style}. Full figures are available in “Read this ${style} as text” below.`;
+    image.alt=`${selected.name} welfare ${style}. Full figures are available in “Read this ${style} as text” below.`;
     image.setAttribute('aria-details','document-text');
     $('graphic').replaceChildren(image);
     canvas.width=1;canvas.height=1;

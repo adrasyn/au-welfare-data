@@ -26,7 +26,7 @@ export async function exportGraphic(summary,style,format,canonicalOrigin) {
   const fit=Math.min(1,(pageHeight-12)/height);
   const finalWidth=width*fit;
   doc.addImage(canvas.toDataURL('image/png'),'PNG',(pageWidth-finalWidth)/2,style==='receipt'?0:6,finalWidth,height*fit,undefined,'FAST');
-  doc.setProperties({title:`${summary.area.name} benefits ${style}`,subject:`Recipients and estimated programme spending, ${summary.financialYear}`,author:'Benefits Data Australia'});
+  doc.setProperties({title:`${summary.area.name} welfare ${style}`,subject:`Recipients and estimated programme spending, ${summary.financialYear}`,author:'Welfare Data Australia'});
   return doc.output('blob');
 }
 export function saveBlob(blob,filename,link) {

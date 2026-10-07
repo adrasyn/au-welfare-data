@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Find benefit recipient counts and estimated spending in your Australian federal electorate or council area. Download a local receipt or invoice.">
+  <meta name="description" content="Find welfare recipient counts and estimated spending in your Australian federal electorate or council area. Download a local receipt or invoice.">
   <meta name="theme-color" content="#ffffff">
-  <title>Benefits Data Australia — Your area's benefits bill</title>
+  <title>Welfare Data Australia — Your area's welfare bill</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/styles.css">
   <script type="module" src="/app.mjs"></script>
@@ -13,15 +13,15 @@
 <body>
   <a class="skip-link" href="#main">Skip to area search</a>
   <header class="site-header">
-    <a class="brand" href="/" aria-label="Benefits Data Australia home">
+    <a class="brand" href="/" aria-label="Welfare Data Australia home">
       <svg class="brand-mark" width="36" height="40" viewBox="0 0 36 40" aria-hidden="true"><path d="M6 3h24v34l-4-3-4 3-4-3-4 3-4-3-4 3V3Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 12h12M12 19h12M12 26h6" stroke="currentColor" stroke-width="2"/></svg>
-      <span>Benefits Data<span class="brand-country">Australia</span></span>
+      <span>Welfare Data<span class="brand-country">Australia</span></span>
     </a>
     <nav aria-label="Main"><a href="#method">How we calculate</a><a href="#rankings">Rankings</a><a href="#sources">Data sources</a></nav>
   </header>
   <main id="main">
     <section class="intro" aria-labelledby="page-title">
-      <div><h1 id="page-title">Your area's<br>benefits bill.</h1><p>Explore who receives support and how much is spent. Find your area, then download a receipt or invoice.</p></div>
+      <div><h1 id="page-title">Your area's<br>welfare bill.</h1><p>Explore who receives support and how much is spent. Find your area, then download a receipt or invoice.</p></div>
       <div class="intro-note"><span class="data-dot" aria-hidden="true"></span><span>National expenditure. Local estimates.<br><strong id="financial-year">Financial year 2024–25</strong></span></div>
     </section>
     <div class="workspace">
@@ -50,7 +50,7 @@
           <div class="subtotal"><div><strong id="subtotal-label">Programme subtotal</strong><p>Rent Assistance is not added again.</p></div><strong id="subtotal-money"></strong></div>
           <p id="incomplete-note" class="inline-note" hidden></p>
           <ul id="data-issues" class="inline-note" hidden></ul>
-          <p class="summary-footnote">Recipient counts can overlap. This selection covers nine benefit groups, rather than all welfare spending. Local spending figures are estimates.</p>
+          <p class="summary-footnote">Recipient counts can overlap. This selection covers nine welfare payment groups, rather than all welfare spending. Local spending figures are estimates.</p>
           <p class="rate-context">FTB counts families and Rent Assistance counts income units, so their rates are per 1,000 residents, rather than percentages of people. <a href="#rankings" data-ranking-metric="jobseeker">Compare recipient rates in the rankings.</a></p>
           <button id="view-document" class="secondary mobile-preview-link" type="button">View and download your receipt</button>
         </section>
@@ -60,7 +60,7 @@
         <div class="style-tabs" role="group" aria-label="Document style"><button id="receipt-tab" type="button" data-style="receipt" aria-pressed="true">Receipt <span>Per resident</span></button><button id="invoice-tab" type="button" data-style="invoice" aria-pressed="false">Invoice <span>Area spending</span></button></div>
         <div id="preview-frame" class="preview-frame">
           <div id="empty-preview" class="empty-preview">
-            <div class="empty-receipt" aria-hidden="true"><span>Benefits Data<br>Australia</span><div></div><i></i><i></i><i></i><i></i><i></i><b></b><div></div><small>Your area. Your figures.</small></div>
+            <div class="empty-receipt" aria-hidden="true"><span>Welfare Data<br>Australia</span><div></div><i></i><i></i><i></i><i></i><i></i><b></b><div></div><small>Your area. Your figures.</small></div>
             <h3>Your receipt starts here.</h3><p>Search for a postcode or area to see its payments, recipient counts and spending.</p>
           </div>
           <div id="graphic" hidden></div>
@@ -92,7 +92,7 @@
       <details id="sources"><summary>View the data sources</summary><ul id="source-list"></ul></details>
     </section>
   </main>
-  <footer class="site-footer"><span>Benefits Data Australia</span><span>Australian benefits, explained locally.</span><a href="#main">Back to search</a></footer>
+  <footer class="site-footer"><span>Welfare Data Australia</span><span>Australian welfare, explained locally.</span><a href="#main">Back to search</a></footer>
   <noscript><p>This tool needs JavaScript to search areas and generate receipts. Enable JavaScript and reload the page.</p></noscript>
 </body>
 </html>

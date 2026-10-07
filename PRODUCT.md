@@ -6,7 +6,7 @@ product
 
 ## Users
 
-The Australian general public exploring benefit spending in a federal electorate or council area, often on a phone.
+The Australian general public exploring welfare spending in a federal electorate or council area, often on a phone.
 
 ## Product Purpose
 

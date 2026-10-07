@@ -29,7 +29,7 @@ test('QR area links pin both stable identity and data release',()=>{
   assert.equal(areaLink(summary,'https://example.com'), 'https://example.com/?area=ced%3A101&release=2024-25-v1');
 });
 test('download names include area geography, name, style and release',()=>{
-  assert.equal(exportFilename(summary,'invoice','pdf'),'benefits-ced-banks-invoice-2024-25-v1.pdf');
+  assert.equal(exportFilename(summary,'invoice','pdf'),'welfare-ced-banks-invoice-2024-25-v1.pdf');
 });
 test('export dates follow their actual source metadata rather than fixed labels',()=>{
   const dated={...summary,countDate:'2024-03-31',populationDate:'2023-06-30'};

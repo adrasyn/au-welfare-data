@@ -1,6 +1,6 @@
-# Benefits Data Australia
+# Welfare Data Australia
 
-A search-first Australian benefit receipt and invoice generator. Covers nine selected benefit groups across 150 federal electorates and 547 ABS council/statistical local areas, with postcode choices, source recipient counts and estimated spending. Mobile uses search and a stacked document preview; this release has no map.
+A search-first Australian welfare receipt and invoice generator. Covers nine selected welfare payment groups across 150 federal electorates and 547 ABS council/statistical local areas, with postcode choices, source recipient counts and estimated spending. Mobile uses search and a stacked document preview; this release has no map.
 
 Area search uses a dropdown anchored directly beneath the field, with explicit Postcode, Division and LGA badges. Two/three-digit postcode prefixes offer postcode suggestions; choosing a postcode opens its matching divisions and LGAs in the same dropdown. Four-digit postcodes directly show all matching areas with postcode context. A postcode is a lookup route, not a monetary reporting area. Results scroll within the dropdown and its height follows the available viewport, including visual-viewport resize events. Arrow keys, Enter, Escape, Tab, pointer selection and outside dismissal are supported through a combobox/listbox pattern.
 

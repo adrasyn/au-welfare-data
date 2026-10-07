@@ -8,12 +8,12 @@ export function areaLink(summary,origin) {
 }
 export function exportFilename(summary,style,format) {
   const name=summary.area.name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  return `benefits-${summary.area.type}-${name}-${style}-${summary.releaseId}.${format}`;
+  return `welfare-${summary.area.type}-${name}-${style}-${summary.releaseId}.${format}`;
 }
 export function documentContent(summary,style) {
   const receipt=style==='receipt';
   return {
-    title:receipt?'Benefits receipt':'Benefits invoice',
+    title:receipt?'Welfare receipt':'Welfare invoice',
     area:summary.area.name,
     geography:`${summary.area.type==='ced'?'Federal electorate':'Council area'} · ${summary.area.state}`,
     period:`Financial year ${summary.financialYear.replace('-','–')}`,
@@ -72,13 +72,13 @@ export function renderGraphic(summary,style,qrImage) {
     ctx.beginPath();ctx.strokeStyle='#adb2b2';ctx.lineWidth=1.5;ctx.setLineDash(dashed?[7,5]:[]);ctx.moveTo(margin,baseline);ctx.lineTo(right,baseline);ctx.stroke();ctx.setLineDash([]);
   }
   if(receipt) {
-    text('BENEFITS DATA',width/2,y,{size:34,bold:true,align:'center'});y+=36;
+    text('WELFARE DATA',width/2,y,{size:34,bold:true,align:'center'});y+=36;
     text('AUSTRALIA',width/2,y,{size:26,align:'center'});y+=58;
-    text('BENEFITS RECEIPT',width/2,y,{size:27,bold:true,align:'center'});y+=48;
+    text('WELFARE RECEIPT',width/2,y,{size:27,bold:true,align:'center'});y+=48;
     y=wrap(content.area,margin,y,width-margin*2,{size:36,bold:true});
     text(content.geography,margin,y,{size:23});y+=43;
   } else {
-    text('Benefits Data Australia',margin,y,{size:29,bold:true});
+    text('Welfare Data Australia',margin,y,{size:29,bold:true});
     text('INVOICE',right,y,{size:33,bold:true,align:'right'});y+=64;
     y=wrap(content.area,margin,y,width-margin*2,{size:45,bold:true});
     text(content.geography,margin,y,{size:24});y+=45;
