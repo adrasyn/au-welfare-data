@@ -16,5 +16,8 @@
     "jspdf": "4.2.1",
     "qrcode": "1.5.4"
   },
-  "devDependencies": { "esbuild": "0.28.2" }
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "jsqr": "1.4.0"
+  }
 }
