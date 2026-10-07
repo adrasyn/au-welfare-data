@@ -21,17 +21,15 @@
   </header>
   <main id="main">
     <section class="intro" aria-labelledby="page-title">
-      <div><h1 id="page-title">Your area's<br>welfare bill.</h1><p>Explore who receives support and how much is spent. Find your area, then download a receipt or invoice.</p></div>
-      <div class="intro-note"><span class="data-dot" aria-hidden="true"></span><span>National expenditure. Local estimates.<br><strong id="financial-year">Financial year 2024–25</strong></span></div>
+      <div><h1 id="page-title">Your area's welfare bill.</h1><p>Explore who receives support and how much is spent. Find your area, then download a receipt or invoice.</p></div>
     </section>
     <section class="scope-picker" aria-label="Welfare programme group">
       <p class="scope-label">Which programmes?</p>
-      <div class="scope-buttons" role="group" aria-label="Choose welfare programmes" aria-describedby="scope-description">
+      <div class="scope-buttons" role="group" aria-label="Choose welfare programmes">
         <button type="button" data-scope="all" aria-pressed="true" disabled>All selected welfare</button>
         <button type="button" data-scope="working" aria-pressed="false" disabled>Working-age &amp; family support</button>
         <button type="button" data-scope="retirement" aria-pressed="false" disabled>Retirement &amp; aged care</button>
       </div>
-      <p id="scope-description" class="help"></p>
     </section>
     <div class="workspace">
       <div class="explorer">
@@ -56,11 +54,10 @@
           <div class="summary-caption"><span id="recipient-date">Recipients at June 2025</span><span id="spending-year">Estimated spend in 2024–25</span></div>
           <div class="payment-heading" aria-hidden="true"><span>Payment</span><span>Recipients</span><span>Annual spend</span></div>
           <ul id="payment-list" class="payment-list"></ul>
-          <div class="subtotal"><div><strong id="subtotal-label">Programme subtotal</strong><p>Rent Assistance is not added again.</p></div><strong id="subtotal-money"></strong></div>
+          <div class="subtotal"><div><strong id="subtotal-label">Total</strong></div><strong id="subtotal-money"></strong></div>
           <p id="incomplete-note" class="inline-note" hidden></p>
           <ul id="data-issues" class="inline-note" hidden></ul>
           <p class="summary-footnote">Recipient counts can overlap. These are selected payments and services, rather than all welfare spending. Local spending figures are estimates.</p>
-          <p class="rate-context">FTB counts families and Rent Assistance counts income units, so their rates are per 1,000 residents, rather than percentages of people. <a id="compare-recipient-rates" href="#rankings" data-ranking-metric="jobseeker">Compare recipient rates in the rankings.</a></p>
           <button id="view-document" class="secondary mobile-preview-link" type="button">View and download your receipt</button>
         </section>
       </div>
@@ -83,7 +80,7 @@
       </aside>
     </div>
     <section id="rankings" class="rankings-section" aria-labelledby="rankings-title">
-      <div class="rankings-heading"><div><p class="area-type">Compare Australia</p><h2 id="rankings-title">Spending &amp; recipient rankings</h2></div><span id="ranking-year"></span></div>
+      <div class="rankings-heading"><h2 id="rankings-title">Spending &amp; recipient rankings</h2></div>
       <p id="ranking-intro" class="rankings-intro">Highest to lowest estimated total annual spending on the selected payments.</p>
       <p id="rankings-loading" class="status">Loading spending rankings…</p>
       <p id="ranking-scope" class="help"></p>
@@ -105,7 +102,7 @@
         <p><strong>Illustrative example:</strong> if a programme's reported spending is $100 million, including $10 million of Rent Assistance, adding that $10 million again would incorrectly produce $110 million. The programme total remains $100 million.</p>
         <p>We still show Rent Assistance recipients and estimated spending so you can see the support provided. Its separate estimate covers payments across programmes, including some outside this site's selection, such as Austudy and ABSTUDY. It is not an exact breakdown of the rows above. Our subtotal covers selected programmes, rather than all Australian welfare spending.</p>
       </div></details>
-      <details id="method"><summary>How are these figures calculated?</summary><div class="method-content"><p id="method-allocation"></p><p id="method-counts"></p><p id="method-geography"></p><p id="method-overlap"></p><p id="method-population"></p><p>Figures are frozen to data release <strong id="data-release">2024-25-v1</strong>. A postcode uses ABS Postal Area approximations and can span several areas. PO Box-only postcodes may not be represented; search by area name instead.</p></div></details>
+      <details id="method"><summary>How are these figures calculated?</summary><div class="method-content"><p id="method-scope"></p><p id="method-allocation"></p><p id="method-counts"></p><p id="method-geography"></p><p id="method-overlap"></p><p id="method-population"></p><p>Figures are frozen to data release <strong id="data-release">2024-25-v1</strong>. A postcode uses ABS Postal Area approximations and can span several areas. PO Box-only postcodes may not be represented; search by area name instead.</p></div></details>
       <details id="sources"><summary>View the data sources</summary><ul id="source-list"></ul></details>
     </section>
   </main>
