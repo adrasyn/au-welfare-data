@@ -1,4 +1,4 @@
-import { formatAUD, formatCount, formatSourceDate } from './model.mjs';
+import { formatAUD, formatCount, formatSourceDate, formatRecipientRate } from './model.mjs';
 
 export function areaLink(summary,origin) {
   const url=new URL('/',origin);
@@ -18,10 +18,12 @@ export function documentContent(summary,style) {
     geography:`${summary.area.type==='ced'?'Federal electorate':'Council area'} · ${summary.area.state}`,
     period:`Financial year ${summary.financialYear.replace('-','–')}`,
     countDate:`Recipient snapshot: ${formatSourceDate(summary.countDate)}`,
-    populationDate:`Resident population: ${formatSourceDate(summary.populationDate)}`,
+    populationDate:`${summary.perResidentAvailable?formatCount({...summary.area.population,unit:'residents'}):'Population unavailable'} · ${formatSourceDate(summary.populationDate)}`,
     unit:receipt?'Estimated annual spending per resident':'Estimated annual programme spending',
     rows:summary.groups.map(group=>({label:group.short??group.label,
       countLines:group.counts.map(count=>`${['People','Participants'].includes(count.label)?'':count.label+': '}${formatCount(count)}`),
+      rateLines:group.counts.map(count=>formatRecipientRate(count.rate)),
+      combinedRate:['youth','parenting'].includes(group.id)?`Combined: ${formatRecipientRate(summary.recipientMeasures.find(metric=>metric.id===group.id).rate)}`:null,
       money:formatAUD((receipt?group.perResident:group.spending).value,{roundTo:receipt?1:1000}),
       nonAdditive:group.additive===false,unavailable:group.spending.value===null,issues:group.issues??[]})),
     total:formatAUD((receipt?summary.totalPerResident:summary.total).value,{roundTo:receipt?1:1000}),
@@ -30,6 +32,7 @@ export function documentContent(summary,style) {
       'Local spending is estimated from national expenditure and recipient shares.',
       'Rent Assistance is shown for context and not added to the subtotal; it overlaps primary payment expenditure.',
       'Counts can overlap. FTB counts cover instalment families; NDIS council conversions are estimated where boundaries change.',
+      'Recipient rates use the dated population. Families and income units are per 1,000 residents, not percentages of people.',
       receipt?'AUD per resident, rounded to whole dollars.':'AUD, rounded to the nearest $1,000.',
       ...(summary.issues??[]),
       'Sources: DSS, NDIA, ABS and Productivity Commission. Scan for data, dates and full methodology.'
@@ -94,14 +97,22 @@ export function renderGraphic(summary,style,qrImage) {
     if(receipt) {
       y=wrap(row.label,margin,y,width-margin*2,{size:28,bold:true});
       text(row.money,right,y,{size:32,bold:true,align:'right'});y+=38;
-      for(const countLine of row.countLines) y=wrap(countLine,margin,y,width-margin*2,{size:24});
+      for(let i=0;i<row.countLines.length;i++){
+        y=wrap(row.countLines[i],margin,y,width-margin*2,{size:24});
+        y=wrap(row.rateLines[i],margin,y,width-margin*2,{size:21,colour:'#515858'});
+      }
+      if(row.combinedRate)y=wrap(row.combinedRate,margin,y,width-margin*2,{size:21,bold:true});
       if(row.nonAdditive) y=wrap('Cross-program estimate; not added to subtotal',margin,y,width-margin*2,{size:21});
       y+=13;line(y,true);y+=35;
     } else {
       const start=y;
       const endLabel=wrap(row.label,margin,y,345,{size:25,bold:true});
       let countEnd=y;
-      for(const countLine of row.countLines) countEnd=wrap(countLine,margin+385,countEnd,290,{size:22});
+      for(let i=0;i<row.countLines.length;i++){
+        countEnd=wrap(row.countLines[i],margin+385,countEnd,290,{size:22});
+        countEnd=wrap(row.rateLines[i],margin+385,countEnd,290,{size:19,colour:'#515858'});
+      }
+      if(row.combinedRate)countEnd=wrap(row.combinedRate,margin+385,countEnd,290,{size:19,bold:true});
       text(row.money,right,y,{size:26,bold:true,align:'right'});
       y=Math.max(endLabel,countEnd)+16;
       if(row.nonAdditive) y=wrap('Cross-program estimate; not added to subtotal',margin,y,right-margin,{size:20});

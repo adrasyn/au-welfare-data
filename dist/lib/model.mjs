@@ -20,6 +20,33 @@ export function formatSourceDate(date) {
   return new Intl.DateTimeFormat('en-AU',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(`${date}T00:00:00Z`));
 }
 
+export const recipientMetrics=[
+  {id:'jobseeker',group:'jobseeker',label:'JobSeeker Payment',indices:[0],unit:'people'},
+  {id:'youth',group:'youth',label:'Youth Allowance',indices:[0,1],unit:'people'},
+  {id:'ndis',group:'ndis',label:'NDIS',indices:[0],unit:'participants'},
+  {id:'ftb-a',group:'ftb',label:'Family Tax Benefit Part A',indices:[0],unit:'families'},
+  {id:'ftb-b',group:'ftb',label:'Family Tax Benefit Part B',indices:[1],unit:'families'},
+  {id:'cra',group:'cra',label:'Rent Assistance',indices:[0],unit:'income-units'},
+  {id:'dsp',group:'dsp',label:'Disability Support Pension',indices:[0],unit:'people'},
+  {id:'age',group:'age',label:'Age Pension',indices:[0],unit:'people'},
+  {id:'parenting',group:'parenting',label:'Parenting Payment',indices:[0,1],unit:'people'},
+  {id:'carer',group:'carer',label:'Carer Payment',indices:[0],unit:'people'}
+];
+
+function recipientRate(count,population,geographyVintage) {
+  const unit=['people','participants'].includes(count.unit)?'percent':count.unit==='families'?'families-per-1000':'income-units-per-1000';
+  const available=Number.isFinite(count.value)&&count.value>=0&&!['suppressed','unavailable'].includes(count.status)&&Number.isFinite(population?.value)&&population.value>0&&population.geographyVintage===geographyVintage;
+  return {value:available?count.value/population.value*(unit==='percent'?100:1000):null,unit,status:available?'estimated':'unavailable'};
+}
+
+export function formatRecipientRate(rate,{compact=false}={}) {
+  if(!Number.isFinite(rate?.value))return 'Rate unavailable';
+  const value=rate.value>0&&rate.value<0.1?'<0.1':rate.value.toLocaleString('en-AU',{minimumFractionDigits:1,maximumFractionDigits:1});
+  if(rate.unit==='percent')return compact?`${value}%`:`${value}% of residents`;
+  const units=rate.unit==='families-per-1000'?'families':'income units';
+  return compact?`${value} / 1,000`:`${value} ${units} per 1,000 residents`;
+}
+
 export function allocationIssues(group,area,release={}) {
   const issues=[];
   if(!group.financialYear || group.spending?.period!==group.financialYear || (release.financialYear && group.financialYear!==release.financialYear)) issues.push('spending period does not match the financial year');
@@ -32,11 +59,14 @@ export function allocationIssues(group,area,release={}) {
 
 export function buildSummary(area,release={}) {
   const population=area.population;
-  const perResidentAvailable=Number.isFinite(population?.value) && population.value>0 && population.geographyVintage===area.geographyVintage;
+  const perResidentAvailable=Number.isFinite(population?.value) && population.value>0 && population.geographyVintage===area.geographyVintage && (!release.populationDate||population.period===release.populationDate);
   const groups=area.groups.map(group=>{
     const issues=allocationIssues(group,area,release);
     const spending=issues.length?{...group.spending,value:null,status:'unavailable'}:group.spending;
-    const counts=group.counts.map(count=>count.geographyVintage!==area.geographyVintage || count.period!==group.allocationCountDate || (release.countDate && count.period!==release.countDate)?{...count,value:null,status:'unavailable',displayBound:null}:count);
+    const counts=group.counts.map(count=>{
+      const safe=count.geographyVintage!==area.geographyVintage || count.period!==group.allocationCountDate || (release.countDate && count.period!==release.countDate)?{...count,value:null,status:'unavailable',displayBound:null}:count;
+      return {...safe,rate:recipientRate(safe,perResidentAvailable?population:null,area.geographyVintage)};
+    });
     const components=group.components?.map(component=>({...component,spending:issues.length?{...component.spending,value:null,status:'unavailable'}:component.spending}));
     return {...group,counts,spending,components,issues,
       perResident:{...spending,value:perResidentAvailable && spending.value!==null?spending.value/population.value:null}};
@@ -59,9 +89,16 @@ export function buildSummary(area,release={}) {
   if(!perResidentAvailable) notes.push('Per-resident values are unavailable because a compatible positive population estimate is missing.');
   const issues=groups.flatMap(group=>group.issues.map(issue=>`${group.label}: ${issue}. This spending estimate is withheld.`));
   if(!perResidentAvailable) issues.push('Per-resident values are unavailable because a compatible positive population estimate is missing. The area invoice remains available.');
+  const recipientMeasures=recipientMetrics.map(metric=>{
+    const group=groups.find(group=>group.id===metric.group);
+    const counts=metric.indices.map(index=>group?.counts[index]);
+    const available=counts.every(count=>count&&Number.isFinite(count.value)&&count.unit===metric.unit&&!['suppressed','unavailable'].includes(count.status));
+    const count={value:available?counts.reduce((sum,count)=>sum+count.value,0):null,unit:metric.unit,status:available?(counts.some(count=>count.status==='estimated')?'estimated':'reported'):'unavailable'};
+    return {...metric,count,rate:recipientRate(count,perResidentAvailable?population:null,area.geographyVintage)};
+  });
   return {area,groups,total:{value,status:value===null?'unavailable':'estimated',unit:'AUD'},
     totalPerResident:{value:perResidentAvailable && value!==null?value/population.value:null,status:'estimated',unit:'AUD'},
     totalLabel:incomplete?'Incomplete programme subtotal':overlap?'Programme subtotal':'Selected programme total',
-    perResidentAvailable,incomplete,notes,issues,releaseId:release.id??'2024-25-v1',financialYear:release.financialYear??[...periods][0],
+    perResidentAvailable,incomplete,notes,issues,recipientMeasures,releaseId:release.id??'2024-25-v1',financialYear:release.financialYear??[...periods][0],
     countDate:release.countDate??'2025-06-30',populationDate:population?.period??release.populationDate};
 }
