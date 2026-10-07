@@ -59,21 +59,20 @@ test('recipient-rate ranking preserves full precision and exact competition ties
   const result=buildRankings(release([area('a',10000,[group('jobseeker',[count(104)])]),area('b',10000,[group('jobseeker',[count(105)])]),area('c',20000,[group('jobseeker',[count(210)])])]),'lga','jobseeker');
   assert.deepEqual(result.rows.map(r=>[r.area.name,r.rank]),[['b',1],['c',1],['a',3]]);
 });
-test('page and both document styles carry the same rates and population context',()=>{
+test('invoice carries recipient rates and both document styles retain population context',()=>{
   const summary=model.buildSummary(area('a',1000,[group('jobseeker',[count(50)])]));
   for(const style of ['receipt','invoice']){
     const content=documentContent(summary,style);
     assert.match(content.populationDate,/1,000 residents.*June 2024/);
-    assert.ok(content.rows[0].rateLines.some(line=>line.includes('5.0% of residents')));
+    if(style==='invoice')assert.ok(content.rows[0].rateLines.some(line=>line.includes('5.0% of residents')));
+    else assert.deepEqual(content.rows[0].rateLines,[]);
   }
 });
-test('combined Youth Allowance and Parenting rates also appear in both downloaded styles',()=>{
+test('combined Youth Allowance and Parenting rates appear in the detailed invoice',()=>{
   const summary=model.buildSummary(area('a',1000,[group('youth',[count(20),count(30)]),group('parenting',[count(10),count(5)])]));
-  for(const style of ['receipt','invoice']){
-    const content=documentContent(summary,style);
+    const content=documentContent(summary,'invoice');
     assert.equal(content.rows[0].combinedRate,'Combined: 5.0% of residents');
     assert.equal(content.rows[1].combinedRate,'Combined: 1.5% of residents');
-  }
 });
 test('source-based Sydney recipient shares use its dated ABS population and preserve FTB counts',async()=>{
   const data=JSON.parse(await readFile(new URL('../dist/data/releases/2024-25-v1.json',import.meta.url)));

@@ -12,7 +12,7 @@ Primary `oklch(0.48 0.11 74.6)`, background `oklch(1 0 0)`, surface `oklch(0.965
 
 ## Type
 
-System sans for navigation, labels and data; fixed rem/pixel scale. Courier New for the receipt, conventional sans for the invoice. Headline 48px desktop/34px mobile, body 16px, data labels 12–14px. Amounts use tabular numerals. Canvas exports retain readable counts and source notes.
+System sans for navigation, labels and data; fixed rem/pixel scale. Courier New for the receipt, conventional sans for the invoice. Headline 48px desktop/34px mobile, body 16px, data labels 12–14px. Amounts use tabular numerals. Receipts are compact spending-only images labelled “per person”: all receipt text uses one 24px size, with bold weight for emphasis. Each payment and per-resident amount shares a line, followed by the total, short accounting notes and a QR link to the full figures. Invoices retain recipient counts, rates and detailed source notes.
 
 ## Components and states
 

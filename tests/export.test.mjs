@@ -10,12 +10,15 @@ const summary=buildSummary({id:'ced:101',name:'Banks',state:'NSW',type:'ced',geo
   ]},
   {id:'cra',label:'Rent Assistance',financialYear:'2024-25',allocationCountDate:'2025-06-30',additive:false,spending:{value:10000,status:'estimated',unit:'AUD',period:'2024-25',geographyVintage:'CED2024'},counts:[{label:'Recipient households',value:20,status:'reported',unit:'income-units',period:'2025-06-30',geographyVintage:'CED2024'}]}
 ]},{id:'2024-25-v1',countDate:'2025-06-30'});
-test('both document styles preserve every source count and its unit',()=>{
-  for(const style of ['receipt','invoice']) {
-    const content=documentContent(summary,style);
+test('invoice preserves every source count and its unit',()=>{
+    const content=documentContent(summary,'invoice');
     assert.deepEqual(content?.rows?.[0]?.countLines,['Part A: 100 families','Part B: 80 families']);
     assert.deepEqual(content?.rows?.[1]?.countLines,['Recipient households: 20 income units']);
-  }
+});
+test('receipt omits recipient counts and rates while retaining each spending amount',()=>{
+  const content=documentContent(summary,'receipt');
+  assert.ok(content.rows.every(row=>row.countLines.length===0&&row.rateLines.length===0&&row.combinedRate===null));
+  assert.deepEqual(content.rows.map(row=>row.money),['$1,235','$10']);
 });
 test('receipt is per resident while invoice uses the same annual amount',()=>{
   assert.equal(documentContent(summary,'receipt')?.rows?.[0]?.money,'$1,235');
@@ -40,4 +43,15 @@ test('export dates follow their actual source metadata rather than fixed labels'
 test('share and QR links use the custom production domain',async()=>{
   const app=await readFile(new URL('../dist/app.mjs',import.meta.url),'utf8');
   assert.equal(app.match(/const canonicalOrigin='([^']+)'/)?.[1],'https://auwelfaredata.wlsn.me');
+});
+test('compact receipt notes retain double-counting and estimate disclosures without the full methodology',()=>{
+  const content=documentContent(summary,'receipt');
+  assert.match(content.receiptNotes.join(' '),/estimated/i);
+  assert.match(content.receiptNotes.join(' '),/Rent assistance excluded from total/i);
+  assert.ok(content.receiptNotes.join(' ').length<content.footer.join(' ').length/2);
+});
+test('compact receipt still discloses gross overlap and missing population',()=>{
+  const content=documentContent({...summary,groups:[...summary.groups,{...summary.groups[0],overlapWith:'ndis',additive:true}],issues:['Population unavailable.']},'receipt');
+  assert.match(content.receiptNotes.join(' '),/overlap is not deducted/i);
+  assert.match(content.receiptNotes.join(' '),/Population unavailable/);
 });

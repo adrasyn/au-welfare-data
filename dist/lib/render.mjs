@@ -8,7 +8,7 @@ export function exportFilename(summary,style,format) {
 export function documentContent(summary,style) {
   const receipt=style==='receipt';
   return {
-    title:receipt?'Welfare receipt':'Welfare invoice',
+    title:receipt?'Welfare receipt, per person':'Welfare invoice',
     scopeLabel:summary.scope?.label??'All selected welfare',
     area:summary.area.name,
     geography:`${summary.area.type==='ced'?'Federal electorate':'Council area'} · ${summary.area.state}`,
@@ -17,13 +17,20 @@ export function documentContent(summary,style) {
     populationDate:`${summary.perResidentAvailable?formatCount({...summary.area.population,unit:'residents'}):'Population unavailable'} · ${formatSourceDate(summary.populationDate)}`,
     unit:receipt?'Estimated annual spending per resident':'Estimated annual programme spending',
     rows:summary.groups.map(group=>({label:group.short??group.label,
-      countLines:group.counts.map(count=>`${['People','Participants'].includes(count.label)?'':count.label+': '}${formatCount(count)}${group.countCoverage==='annual'?` · FY${group.financialYear.replace('-','–')}`:''}`),
-      rateLines:group.counts.map(count=>formatRecipientRate(count.rate)),
-      combinedRate:['youth','parenting'].includes(group.id)?`Combined: ${formatRecipientRate(summary.recipientMeasures.find(metric=>metric.id===group.id).rate)}`:null,
+      countLines:receipt?[]:group.counts.map(count=>`${['People','Participants'].includes(count.label)?'':count.label+': '}${formatCount(count)}${group.countCoverage==='annual'?` · FY${group.financialYear.replace('-','–')}`:''}`),
+      rateLines:receipt?[]:group.counts.map(count=>formatRecipientRate(count.rate)),
+      combinedRate:!receipt&&['youth','parenting'].includes(group.id)?`Combined: ${formatRecipientRate(summary.recipientMeasures.find(metric=>metric.id===group.id).rate)}`:null,
       money:formatMoneyObservation((receipt?group.perResident:group.spending),{roundTo:receipt?1:1000}),
       incompleteAmount:group.spending.value===null&&Number.isFinite(group.spending.knownSubtotal),nonAdditive:group.additive===false,nonAdditiveNote:group.nonAdditiveNote??'Cross-program estimate; not added to subtotal',unavailable:group.spending.value===null,issues:group.issues??[]})),
     total:formatAUD((receipt?summary.totalPerResident:summary.total).value,{roundTo:receipt?1:1000}),
     totalLabel:summary.totalLabel,
+    receiptNotes:[
+      'Estimated local spending; AUD per resident (all ages).',
+      '* Rent assistance excluded from total',
+      ...(summary.groups.some(group=>group.overlapWith)?[summary.groups.some(group=>group.overlapWith&&group.additive===false)?'Residential care is not added: can overlap NDIS.':summary.scope?.id==='retirement'?'NDIS is outside this programme selection.':'Aged care / NDIS overlap is not deducted.']:[]),
+      ...(summary.scope?.id&&summary.scope.id!=='all'?['Programme groups, not recipient age bands.']:[]),
+      ...(summary.issues??[])
+    ],
     footer:[
       summary.scope?.description??'Programme groups describe support, not recipient age bands.',
       'Local spending is estimated from national expenditure and recipient shares.',
@@ -53,13 +60,14 @@ export function renderGraphic(summary,style,qrImage) {
   ctx.fillStyle='#ffffff';ctx.fillRect(0,0,width,height);
   const margin=receipt?58:68;
   const right=width-margin;
-  let y=receipt?60:68;
+  let y=receipt?44:68;
   const pageBreaks=[];
   const face=receipt?'"Courier New", monospace':'Arial, sans-serif';
-  function text(text,x,baseline,{size=26,bold=false,align='left',colour='#202222'}={}) {
+  const receiptSize=24;
+  function text(text,x,baseline,{size=receipt?receiptSize:26,bold=false,align='left',colour='#202222'}={}) {
     ctx.font=`${bold?'bold ':''}${size}px ${face}`;ctx.fillStyle=colour;ctx.textAlign=align;ctx.fillText(text,x,baseline);
   }
-  function wrap(text,x,baseline,maxWidth,{size=24,bold=false,lineHeight=size*1.35,colour='#343a40',align='left'}={}) {
+  function wrap(text,x,baseline,maxWidth,{size=receipt?receiptSize:24,bold=false,lineHeight=size*(receipt?1.2:1.35),colour='#343a40',align='left'}={}) {
     ctx.font=`${bold?'bold ':''}${size}px ${face}`;
     let line='';let cursor=baseline;
     for(const word of text.split(/\s+/)) {
@@ -75,11 +83,10 @@ export function renderGraphic(summary,style,qrImage) {
     ctx.beginPath();ctx.strokeStyle='#adb2b2';ctx.lineWidth=1.5;ctx.setLineDash(dashed?[7,5]:[]);ctx.moveTo(margin,baseline);ctx.lineTo(right,baseline);ctx.stroke();ctx.setLineDash([]);
   }
   if(receipt) {
-    text('WELFARE DATA',width/2,y,{size:34,bold:true,align:'center'});y+=36;
-    text('AUSTRALIA',width/2,y,{size:26,align:'center'});y+=58;
-    text('WELFARE RECEIPT',width/2,y,{size:27,bold:true,align:'center'});y+=48;
-    y=wrap(content.area,margin,y,width-margin*2,{size:36,bold:true});
-    text(content.geography,margin,y,{size:23});y+=43;
+    text('WELFARE DATA AUSTRALIA',width/2,y,{bold:true,align:'center'});y+=34;
+    text(content.title.toUpperCase(),width/2,y,{align:'center'});y+=38;
+    y=wrap(content.area.toUpperCase(),width/2,y,width-margin*2,{bold:true,align:'center'});
+    text(content.geography,width/2,y,{align:'center'});y+=30;
   } else {
     text('Welfare Data Australia',margin,y,{size:29,bold:true});
     if(qrImage)ctx.drawImage(qrImage,right-130,y+45,130,130);
@@ -87,12 +94,12 @@ export function renderGraphic(summary,style,qrImage) {
     y=wrap(content.area,margin,y,width-margin*2-(qrImage?170:0),{size:45,bold:true});
     text(content.geography,margin,y,{size:24});y+=45;
   }
-  text(content.scopeLabel,margin,y,{size:24,bold:true});y+=33;
-  text(content.period,margin,y,{size:24});y+=33;
-  text(content.countDate,margin,y,{size:22});y+=33;
-  text(content.populationDate,margin,y,{size:22});y+=37;
-  y=wrap(content.unit,margin,y,width-margin*2,{size:24,bold:true});y+=15;
-  line(y,receipt);y+=43;
+  text(content.scopeLabel,margin,y,{size:24,bold:true});y+=receipt?29:33;
+  text(content.period,margin,y,{size:24});y+=receipt?29:33;
+  if(!receipt){text(content.countDate,margin,y,{size:22});y+=33;}
+  text(content.populationDate,margin,y,{size:receipt?receiptSize:22});y+=receipt?29:37;
+  if(!receipt){y=wrap(content.unit,margin,y,width-margin*2,{size:24,bold:true});y+=15;}
+  line(y,receipt);y+=receipt?33:43;
   if(!receipt) {
     text('Programme',margin,y,{size:23,bold:true});
     text('Recipients',margin+385,y,{size:23,bold:true});
@@ -100,16 +107,13 @@ export function renderGraphic(summary,style,qrImage) {
   }
   for(const row of content.rows) {
     if(receipt) {
-      y=wrap(row.label,margin,y,width-margin*2,{size:28,bold:true});
-      if(row.incompleteAmount)y=wrap(row.money,right,y,width-margin*2,{size:28,bold:true,align:'right'});
-      else {text(row.money,right,y,{size:32,bold:true,align:'right'});y+=38;}
-      for(let i=0;i<row.countLines.length;i++){
-        y=wrap(row.countLines[i],margin,y,width-margin*2,{size:24});
-        y=wrap(row.rateLines[i],margin,y,width-margin*2,{size:21,colour:'#515858'});
-      }
-      if(row.combinedRate)y=wrap(row.combinedRate,margin,y,width-margin*2,{size:21,bold:true});
-      if(row.nonAdditive) y=wrap(row.nonAdditiveNote,margin,y,width-margin*2,{size:21});
-      y+=13;line(y,true);y+=35;
+      const labelEnd=wrap(row.label.toUpperCase()+(row.nonAdditive?' *':''),margin,y,width-margin*2-190,{bold:true});
+      let moneyEnd=y+receiptSize*1.2;
+      if(row.incompleteAmount)moneyEnd=wrap(row.money,right,y,180,{bold:true,align:'right'});
+      else text(row.money,right,y,{bold:true,align:'right'});
+      y=Math.max(labelEnd,moneyEnd);
+      if(row.nonAdditive&&row.label!=='Rent Assistance')y=wrap(row.nonAdditiveNote,margin,y,width-margin*2);
+      line(y-8,true);y+=16;
     } else {
       const start=y;
       const endLabel=wrap(row.label,margin,y,345,{size:25,bold:true});
@@ -129,14 +133,21 @@ export function renderGraphic(summary,style,qrImage) {
     }
   }
   y+=8;
-  text(content.totalLabel,margin,y,{size:receipt?24:27,bold:true});
-  if(receipt) y+=48;
-  text(content.total,right,y,{size:receipt?42:34,bold:true,align:'right'});y+=40;
-  line(y,receipt);y+=38;
-  for(const note of content.footer) {y=wrap(note,margin,y,width-margin*2,{size:receipt?21:22});y+=12;pageBreaks.push(y-28);}
-  y+=18;
-  if(qrImage&&receipt) {const qrSize=150;ctx.drawImage(qrImage,margin,y,qrSize,qrSize);text('View this area',margin+qrSize+25,y+45,{size:23,bold:true});text('and its sources',margin+qrSize+25,y+77,{size:21});y+=qrSize+26;}
-  text(`Data release ${summary.releaseId}`,margin,y,{size:19});y+=38;
+  text(receipt?(summary.incomplete?'INCOMPLETE TOTAL':'TOTAL'):content.totalLabel,margin,y,{size:receipt?24:27,bold:true});
+  text(content.total,right,y,{size:receipt?receiptSize:34,bold:true,align:'right'});y+=40;
+  line(y,receipt);y+=receipt?28:38;
+  for(const note of receipt?content.receiptNotes:content.footer) {y=wrap(note,margin,y,width-margin*2,{size:receipt?receiptSize:22});y+=receipt?3:12;pageBreaks.push(y-28);}
+  y+=receipt?8:18;
+  if(receipt){
+    const qrSize=104;
+    if(qrImage)ctx.drawImage(qrImage,margin,y,qrSize,qrSize);
+    const x=qrImage?margin+qrSize+22:margin;
+    text('Full figures & methodology',x,y+22,{bold:true});
+    text('auwelfaredata.wlsn.me',x,y+51);
+    y=wrap('Sources: DSS, NDIA, ABS'+(summary.groups.some(group=>group.id.startsWith('aged-care-'))?', AIHW, Health, PC':', PC'),x,y+80,right-x);
+    y+=18;
+  }
+  text(`Data release ${summary.releaseId}`,margin,y,{size:receipt?receiptSize:19});y+=receipt?30:38;
   const cropped=document.createElement('canvas');cropped.width=canvas.width;cropped.height=Math.ceil(y*scale);
   cropped.getContext('2d').drawImage(canvas,0,0);
   cropped.pageBreaks=pageBreaks.map(y=>Math.ceil(y*scale));
