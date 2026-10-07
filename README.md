@@ -1,6 +1,10 @@
 # Welfare Data Australia
 
-A search-first Australian welfare receipt and invoice generator. Covers nine selected welfare payment groups across 150 federal electorates and 547 ABS council/statistical local areas, with postcode choices, source recipient counts and estimated spending. Mobile uses search and a stacked document preview; this release has no map.
+A search-first Australian welfare receipt and invoice generator. Covers nine selected welfare payment groups plus three aged-care service groups across 150 federal electorates and 547 ABS council/statistical local areas, with postcode choices, source recipient counts and estimated spending. Mobile uses search and a stacked document preview; this release has no map.
+
+The programme toggle selects All welfare, Working-age & family support, or Retirement & aged care. It updates spending totals, per-person values, both rankings and downloads together, and persists in shared/QR links. These are programme-purpose groups, not actual recipient age bands; NDIS and Carer Payment can include older people. Age Pension was already included. The retirement group adds residential care, Home Care Packages and CHSP direct services. Rent Assistance is contextual in both groups and remains excluded from addition. Residential care can overlap NDIS reimbursements, so the All subtotal excludes it; retirement includes it because NDIS is outside that view. The two group totals therefore cannot simply be added together.
+
+Current release `2024-25-v2` preserves every original observation in pinned `2024-25-v1` and adds audited aged-care estimates. Care counts use official ABS correspondence chains and are geographic estimates. Residential counts locate facilities; home-care counts locate recipients. CHSP clients cover the financial year; the other care counts are June snapshots. National spending is allocated using mapped GEN client shares as a proxy, with unknown addresses absent. Other aged-care programmes, administration and private fees are excluded. Missing records retain known partial counts/spending, clearly labelled, without gaining a complete rank. See [the aged-care audit](data/research-aged-care.md).
 
 Area search uses a dropdown anchored directly beneath the field, with explicit Postcode, Division and LGA badges. Two/three-digit postcode prefixes offer postcode suggestions; choosing a postcode opens its matching divisions and LGAs in the same dropdown. Four-digit postcodes directly show all matching areas with postcode context. A postcode is a lookup route, not a monetary reporting area. Results scroll within the dropdown and its height follows the available viewport, including visual-viewport resize events. Arrow keys, Enter, Escape, Tab, pointer selection and outside dismissal are supported through a combobox/listbox pattern.
 
@@ -26,7 +30,7 @@ The `dist/` directory is the complete static website. PDF and QR dependencies ar
 
 ## Data and meaning
 
-The frozen release `2024-25-v1` uses FY2024–25 national programme expenditure, June2025 recipient snapshots, and June2024 ABS resident population on CED/LGA2024 boundaries. Local expenditure is an allocation estimate using recipient shares, rather than actual reported local payments. See [the source audit](data/source-audit.md), [spending evidence](data/research-spending.md), and [geography evidence](data/research-geography.md).
+The frozen releases use FY2024–25 national programme expenditure, June2025 recipient snapshots (except annual CHSP), and June2024 ABS resident population on CED/LGA2024 boundaries. Local expenditure is an allocation estimate using recipient shares, rather than actual reported local payments. See [the source audit](data/source-audit.md), [spending evidence](data/research-spending.md), and [geography evidence](data/research-geography.md).
 
 Recipient units are preserved: individuals, NDIS participants, FTB instalment families and CRA income units. Counts can overlap and are never summed into unique people. FTB lump-sum-only recipients are absent from its count population; that population is disclosed as an allocation proxy. Suppressed observations remain unavailable rather than being imputed.
 
@@ -44,6 +48,8 @@ Run `scripts/extract-workbooks.py` with a Python environment containing `openpyx
 
 Preserve existing published release files: a new financial year or corrected source requires a new release identifier, audited expenditure inputs and denominator dates. Receipt QR codes pin their original area and release. No automatic update schedule is configured.
 
+`npm run data:aged-care` regenerates v2 from the frozen, checked-in `data/aged-care-counts-2025.json` and original v1. To re-extract the count input, acquire the exact sources recorded in `data/aged-care-source-manifest.json`, prepare the two documented legacy XLS correspondence CSVs, and run `scripts/extract-aged-care.py` using Python with openpyxl. The audit records geography chains, source hashes, mapped totals, exclusions and numerical residuals. Replace the frozen input only as part of a newly audited release.
+
 ## Verification and deployment
 
 Unit tests exercise suppression, zero/missing counts, ABS ratio allocation, FTB overlap, CRA non-addition, period/population mismatches, ambiguous postcodes, leading zeros, pinned URLs and consistent document contents. Browser QA checked 320/375/430-pixel mobile widths and desktop, an electorate and a regional council, and both export formats. Eight generated PNG/PDF files were inspected via a temporary localhost capture because the in-app browser did not expose saved-download events; that capture was removed before publication. QR codes decoded to the exact pinned area URLs. Responsive-browser checks do not replace testing a physical phone or its software keyboard.
@@ -60,6 +66,8 @@ The per-person summary/rank update passes all 65 tests. Five new tests were firs
 
 `.openai/hosting.json` points to the owner-private Sites project. Publication uses the native Sites source helper and a saved version of the exact pushed source. Keep the audience private until the owner requests public access.
 
+The programme-scope/aged-care update passes 81 tests, including source preservation, programme-specific allocation, annual dates, overlap handling, partial counts/spending, scope links and complete-only ranks. All ranks cover 139 divisions/497 LGAs, working-age ranks 150/508, and retirement ranks 133/493. Browser QA covers three mobile widths, both geography types, complete Armidale and incomplete Sydney, annual-care rankings, and search retaining the scope. Actual PNG/PDF exports were captured through a temporary localhost hook removed before publication. Long invoices retain readable type on multiple A4 pages; page boundaries and QR placement were visually checked. Physical phone keyboard and screen-reader execution remain untested.
+
 ## Attribution
 
-Recipient statistics © Commonwealth of Australia, Department of Social Services; NDIS statistics © National Disability Insurance Agency; population, allocation and correspondence statistics © Australian Bureau of Statistics; CRA expenditure from Productivity Commission Report on Government Services2026. Original source links are listed in the site. Follow the applicable source licences when reusing the source material; government logos are not reproduced.
+Recipient statistics © Commonwealth of Australia, Department of Social Services; NDIS statistics © National Disability Insurance Agency; population, allocation and correspondence statistics © Australian Bureau of Statistics; aged-care counts from AIHW GEN and spending from the Department of Health and Aged Care's Operation of the Aged Care Act report; CRA expenditure from Productivity Commission Report on Government Services2026. Original source links are listed in the site. Follow the applicable source licences when reusing the source material; government logos are not reproduced.

@@ -1,0 +1,85 @@
+{
+  "entries": [
+    {
+      "id": "gen-home-support-2025.xlsx",
+      "url": "https://www.gen-agedcaredata.gov.au/getmedia/53b57e6e-6be8-401b-b1e8-9baf430d18d4/GEN-data-People-using-aged-care-by-region-2024-25-1-home-support-(recipient-location)",
+      "filename": "gen-home-support-2025.xlsx",
+      "sha256": "c9ef322d7dbc8bfdf3343b6ffea4ba639e691d9f1833d8a5e8dd8d3c772a9c8a",
+      "bytes": 319107
+    },
+    {
+      "id": "gen-home-care-2025.xlsx",
+      "url": "https://www.gen-agedcaredata.gov.au/getmedia/6e2f01d1-f230-4e0d-b869-8c746aa3e372/GEN-data-People-using-aged-care-by-region-30-June-2025-2-home-care-(recipient-location)",
+      "filename": "gen-home-care-2025.xlsx",
+      "sha256": "0ec675accb7c8efc6a00666d34af8c3c7cfb50b27fec84df9e6c78e06941396b",
+      "bytes": 353237
+    },
+    {
+      "id": "gen-residential-2025.xlsx",
+      "url": "https://www.gen-agedcaredata.gov.au/getmedia/77b4008b-88bb-424b-b831-0d729ba3984b/GEN-data-People-using-aged-care-by-region-30-June-2025-4-residential-care-(service-location)",
+      "filename": "gen-residential-2025.xlsx",
+      "sha256": "7f4c7ced55560129dc8aab20f5ba4fbdd021e28af5fd7d99403c4134ff97e9d5",
+      "bytes": 324557
+    },
+    {
+      "id": "CG_SA3_2016_CED_2021.csv",
+      "url": "https://data.gov.au/data/dataset/2c79581f-600e-4560-80a8-98adb1922dfc/resource/33d822ba-138e-47ae-a15f-460279c3acc3/download/asgs2021correspondences.zip",
+      "archiveMember": "CG_SA3_2016_CED_2021.csv",
+      "filename": "CG_SA3_2016_CED_2021.csv",
+      "sha256": "3ba90a92fb96d74c9a80faba631b21bdf6f4e7adc26bc9e5d6866f60bfa55a57",
+      "bytes": 40452
+    },
+    {
+      "id": "CG_CED_2021_CED_2024.csv",
+      "url": "https://data.gov.au/data/dataset/2c79581f-600e-4560-80a8-98adb1922dfc/resource/33d822ba-138e-47ae-a15f-460279c3acc3/download/asgs2021correspondences.zip",
+      "archiveMember": "CG_CED_2021_CED_2024.csv",
+      "filename": "CG_CED_2021_CED_2024.csv",
+      "sha256": "885dc98681ee9c795ea5b94a02538fd389a771dc9458f4f9f357668081a0b392",
+      "bytes": 15606
+    },
+    {
+      "id": "CG_LGA_2018_LGA_2025.csv",
+      "url": "https://data.gov.au/data/dataset/2c79581f-600e-4560-80a8-98adb1922dfc/resource/33d822ba-138e-47ae-a15f-460279c3acc3/download/asgs2021correspondences.zip",
+      "archiveMember": "CG_LGA_2018_LGA_2025.csv",
+      "filename": "CG_LGA_2018_LGA_2025.csv",
+      "sha256": "2cd025b3f35c7f5cfed9683c22e22a1c7889bf05dde4cd325d8a22cf08e0db27",
+      "bytes": 31920
+    },
+    {
+      "id": "CG_LGA_2024_LGA_2025.csv",
+      "url": "https://data.gov.au/data/dataset/2c79581f-600e-4560-80a8-98adb1922dfc/resource/33d822ba-138e-47ae-a15f-460279c3acc3/download/asgs2021correspondences.zip",
+      "archiveMember": "CG_LGA_2024_LGA_2025.csv",
+      "filename": "CG_LGA_2024_LGA_2025.csv",
+      "sha256": "92697d6d02e2c4926f7bc2e81704ae6beb92e9aae6198f9ef67a7e893948579f",
+      "bytes": 28885
+    },
+    {
+      "id": "CG_LGA_2016_LGA_2021.csv",
+      "url": "https://data.gov.au/data/dataset/2c79581f-600e-4560-80a8-98adb1922dfc/resource/33d822ba-138e-47ae-a15f-460279c3acc3/download/asgs2021correspondences.zip",
+      "archiveMember": "CG_LGA_2016_LGA_2021.csv",
+      "filename": "CG_LGA_2016_LGA_2021.csv",
+      "sha256": "7849f286e0dad2c3782ad2403e72e5e2f3199481c47fbee46ed4d50bcf6c97f8",
+      "bytes": 32484
+    },
+    {
+      "id": "CG_SA3_2016_LGA_2017.xls",
+      "url": "https://data.gov.au/data/dataset/23fe168c-09a7-42d2-a2f9-fd08fbd0a4ce/resource/951e18c7-f187-4c86-a73f-fcabcd19af16/download/asgs2016correspondences.zip",
+      "archiveMember": "CG_SA3_2016_LGA_2017.xls",
+      "filename": "CG_SA3_2016_LGA_2017.xls",
+      "extractedCsv": "CG_SA3_2016_LGA_2017.csv",
+      "method": "Tables 3 and 4, PERCENTAGE / 100 to preserve below-minimum ratios rounded to zero in RATIO.",
+      "sha256": "c796d550c07a03e479941670c637cb29343bc1371ec83f645547f0e39660e0c5",
+      "bytes": 390656
+    },
+    {
+      "id": "CG_LGA_2017_LGA_2018.xls",
+      "url": "https://data.gov.au/data/dataset/23fe168c-09a7-42d2-a2f9-fd08fbd0a4ce/resource/951e18c7-f187-4c86-a73f-fcabcd19af16/download/asgs2016correspondences.zip",
+      "archiveMember": "CG_LGA_2017_LGA_2018.xls",
+      "filename": "CG_LGA_2017_LGA_2018.xls",
+      "extractedCsv": "CG_LGA_2017_LGA_2018.csv",
+      "method": "Tables 3 and 4, PERCENTAGE / 100 to preserve below-minimum ratios rounded to zero in RATIO.",
+      "sha256": "b986edd838e2aeaaaa11789ce1940ebba5524625bbd6b2cc05e5b896270e2998",
+      "bytes": 350208
+    }
+  ]
+}

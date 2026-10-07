@@ -27,6 +27,8 @@ The UK reference's political branding is outside this independent site's approve
 - A person may receive multiple payments; counts are not a combined unique-person total.
 - Explain the difference between reported counts and estimated local expenditure.
 - Use official ABS correspondence tables when geography conversion is required.
+- Group programmes by purpose with All, Working-age & family, and Retirement & aged care views. Do not imply that programme groups are recipient age bands.
+- Scope totals, rankings and downloads together; label annual home-support counts, care-location estimates, incomplete coverage and overlapping expenditure.
 
 ## Accessibility & Inclusion
 

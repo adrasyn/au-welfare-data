@@ -1,5 +1,6 @@
 import { jsPDF, QRCode } from '../vendor/export.js';
 import { renderGraphic, areaLink } from './render.mjs';
+import {invoiceSlices} from './pagination.mjs';
 
 async function qrImage(url) {
   const image=new Image();
@@ -21,12 +22,19 @@ export async function exportGraphic(summary,style,format,canonicalOrigin) {
   const naturalHeight=pageWidth*canvas.height/canvas.width;
   const pageHeight=style==='receipt'?naturalHeight:297;
   const doc=new jsPDF({unit:'mm',format:[pageWidth,pageHeight],orientation:'portrait',compress:true});
-  const width=style==='receipt'?pageWidth:pageWidth-12;
-  const height=width*canvas.height/canvas.width;
-  const fit=Math.min(1,(pageHeight-12)/height);
-  const finalWidth=width*fit;
-  doc.addImage(canvas.toDataURL('image/png'),'PNG',(pageWidth-finalWidth)/2,style==='receipt'?0:6,finalWidth,height*fit,undefined,'FAST');
-  doc.setProperties({title:`${summary.area.name} welfare ${style}`,subject:`Recipients and estimated programme spending, ${summary.financialYear}`,author:'Welfare Data Australia'});
+  if(style==='receipt')doc.addImage(canvas.toDataURL('image/png'),'PNG',0,0,pageWidth,naturalHeight,undefined,'FAST');
+  else {
+    const width=pageWidth-12;
+    const slices=invoiceSlices(canvas.height,(pageHeight-12)*canvas.width/width,canvas.pageBreaks);
+    for(const [index,slice] of slices.entries()) {
+      if(index)doc.addPage([pageWidth,pageHeight],'portrait');
+      const page=document.createElement('canvas');page.width=canvas.width;page.height=slice.height;
+      page.getContext('2d').drawImage(canvas,0,slice.start,canvas.width,slice.height,0,0,canvas.width,slice.height);
+      doc.addImage(page.toDataURL('image/png'),'PNG',6,6,width,width*slice.height/canvas.width,undefined,'FAST');
+      doc.setFontSize(8);doc.text(`${summary.area.name} · ${summary.scope?.label??'All selected welfare'} · ${index+1}/${slices.length}`,6,pageHeight-2);
+    }
+  }
+  doc.setProperties({title:`${summary.area.name} welfare ${style} — ${summary.scope?.label??'All selected welfare'}`,subject:`Recipients and estimated programme spending, ${summary.financialYear}`,author:'Welfare Data Australia'});
   return doc.output('blob');
 }
 export function saveBlob(blob,filename,link) {

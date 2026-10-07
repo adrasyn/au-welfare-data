@@ -1,13 +1,15 @@
-import { buildSummary, formatAUD, formatCount, formatSourceDate, formatRecipientRate, recipientMetrics } from './lib/model.mjs';
+import { buildSummary, formatAUD, formatMoneyObservation, formatCount, formatSourceDate, formatRecipientRate, recipientMetrics } from './lib/model.mjs';
 import { searchAreas, searchSuggestions, resolveAreaUrl } from './lib/search.mjs';
 import { documentContent, areaLink, exportFilename } from './lib/render.mjs';
 import { previewGraphic, exportGraphic, saveBlob } from './lib/download.mjs';
 import {buildRankings} from './lib/rankings.mjs';
+import {filterRelease,scopeFor} from './lib/scopes.mjs';
 
 const canonicalOrigin='https://benefits-data-australia.vvlsn.chatgpt.site';
 const $=id=>document.getElementById(id);
 const escape=text=>String(text??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let release,selected,summary,style='receipt',matches=[],previewVersion=0,exporting=false,downloadUrl;
+let baseRelease,welfareScope=scopeFor(new URL(location.href).searchParams.get('scope')).id;
 let postcodes=[],activeSuggestion=-1;
 let rankings,rankingType='ced',rankingPage=0;
 let rankingMetric='spending';
@@ -19,6 +21,22 @@ function buttons() {
   const disabled=!summary||exporting||(style==='receipt'&&!summary.perResidentAvailable);
   $('download-png').disabled=disabled;$('download-pdf').disabled=disabled;
   $('copy-link').disabled=!summary;$('print').disabled=disabled;
+  for(const button of document.querySelectorAll('[data-scope]'))button.disabled=!release||exporting;
+}
+function configureScope() {
+  release=filterRelease(baseRelease,welfareScope);
+  const groups=new Set(release.areas.flatMap(area=>area.groups.map(group=>group.id)));
+  const metrics=recipientMetrics.filter(metric=>groups.has(metric.group));
+  if(!['spending','per-resident'].includes(rankingMetric)&&!metrics.some(metric=>metric.id===rankingMetric))rankingMetric='spending';
+  rankings={ced:buildRankings(release,'ced'),lga:buildRankings(release,'lga')};
+  additionalRankings.clear();rankingPage=0;
+  $('ranking-metric').innerHTML='<option value="spending">Total annual spending</option><option value="per-resident">Annual spending per person</option>'+[['people','Percentage of residents'],['families','Families / income units per 1,000 residents']].map(([unit,label])=>`<optgroup label="${label}">${metrics.filter(metric=>unit==='people'?['people','participants'].includes(metric.unit):['families','income-units'].includes(metric.unit)).map(metric=>`<option value="${metric.id}">${escape(metric.label)}</option>`).join('')}</optgroup>`).join('');
+  $('ranking-metric').value=rankingMetric;
+  $('compare-recipient-rates').dataset.rankingMetric=welfareScope==='retirement'?'age':'jobseeker';
+  $('scope-description').textContent=release.scope.description+' Rent Assistance spans both groups and is shown for context without being added.';
+  if(!baseRelease.areas.some(area=>area.groups.some(group=>group.id.startsWith('aged-care-'))))$('scope-description').textContent+=' This pinned release predates the aged-care additions.';
+  for(const button of document.querySelectorAll('[data-scope]'))button.setAttribute('aria-pressed',String(button.dataset.scope===welfareScope));
+  buttons();
 }
 async function loadData(current=false) {
   status('search-status','Loading area data…');$('retry').hidden=true;
@@ -29,12 +47,9 @@ async function loadData(current=false) {
     const version=requested??(await (await fetch('/data/current.json')).json()).release;
     const response=await fetch(`/data/releases/${version}.json`);
     if(!response.ok) throw new Error('That data release could not be loaded. Load current data or try again.');
-    release=await response.json();
+    baseRelease=await response.json();
+    configureScope();
     postcodes=[...new Set(release.areas.flatMap(area=>area.postcodes))].sort();
-    rankings={ced:buildRankings(release,'ced'),lga:buildRankings(release,'lga')};
-    additionalRankings.clear();
-    $('ranking-metric').innerHTML='<option value="spending">Total annual spending</option><option value="per-resident">Annual spending per person</option>'+[['people','Percentage of residents'],['families','Families / income units per 1,000 residents']].map(([unit,label])=>`<optgroup label="${label}">${recipientMetrics.filter(metric=>unit==='people'?['people','participants'].includes(metric.unit):['families','income-units'].includes(metric.unit)).map(metric=>`<option value="${metric.id}">${escape(metric.label)}</option>`).join('')}</optgroup>`).join('');
-    $('ranking-metric').value=rankingMetric;
     $('rankings-loading').hidden=true;$('rankings-content').hidden=false;
     renderRankings();
     $('financial-year').textContent=`Financial year ${release.financialYear.replace('-','–')}`;
@@ -109,9 +124,11 @@ async function selectArea(area,moveFocus=true,fromRanking=false) {
   $('area-name').textContent=area.name;
   $('area-type').textContent=`${area.type==='ced'?'Federal electorate':'Council area'} · ${area.state}`;
   $('area-population').textContent=summary.perResidentAvailable?`${area.population.value.toLocaleString('en-AU')} residents · ABS ${formatSourceDate(summary.populationDate)}`:'Compatible resident population unavailable. Area spending and recipient counts are shown below.';
-  $('recipient-rate-context').textContent=`Recipient rates: ${formatSourceDate(summary.countDate)} counts ÷ ${formatSourceDate(summary.populationDate)} resident population. Percentages use all residents, including children, and are approximate.`;
+  $('recipient-rate-context').textContent=`Recipient rates use ABS ${formatSourceDate(summary.populationDate)} population, including children. Counts are ${formatSourceDate(summary.countDate)} snapshots, except annual home-support clients. Programme groups are not recipient age bands.`;
+  const residentialExcluded=summary.groups.some(group=>group.id==='aged-care-residential'&&group.additive===false);
+  $('total-note').textContent=`${release.scope.label}. Per-person spending uses all residents, including children. Rent Assistance is not added again.${residentialExcluded?' Residential aged care is shown separately and excluded because it can overlap NDIS spending.':''}`;
   const ranking=rankings[area.type],row=ranking.rows.find(row=>row.area.id===area.id);
-  $('total-spending-label').textContent=summary.incomplete?'Known annual spending subtotal':'Estimated total annual spending';
+  $('total-spending-label').textContent=summary.incomplete?'Known annual spending subtotal':residentialExcluded?'Annual subtotal excluding residential care':'Estimated total annual spending';
   $('total-spending-value').textContent=formatAUD(summary.total.value,{compact:true});
   $('total-spending-exact').textContent=`${formatAUD(summary.total.value,{roundTo:1000})} · FY${summary.financialYear.replace('-','–')}`;
   $('area-spending-rank').textContent=row.rank===null?'Unranked — incomplete spending data':`#${row.rank} of ${ranking.rankedCount} ${area.type==='ced'?'federal divisions':'LGAs'} by total spending`;
@@ -123,13 +140,13 @@ async function selectArea(area,moveFocus=true,fromRanking=false) {
   $('per-person-rank').textContent=perPersonRow.rank===null?(summary.incomplete?'Unranked — incomplete spending data':'Unranked — compatible population unavailable'):`#${perPersonRow.rank} of ${perPersonRanking.rankedCount} ${area.type==='ced'?'federal divisions':'LGAs'} by per-person spending`;
   if(rankingType!==area.type||!fromRanking)rankingPage=0;
   rankingType=area.type;renderRankings();
-  $('payment-list').innerHTML=summary.groups.map(group=>`<li class="payment-row"><div class="payment-name">${escape(group.label)}<details><summary>About this payment</summary><p>${escape(group.id==='cra'?'An extra payment to help eligible renters who receive a qualifying payment. Government spending figures already include Rent Assistance within the payments through which it is paid. Its separate estimate is shown for context; adding it to the subtotal would count some spending twice. Some Rent Assistance is paid through programmes outside this selection.':group.description)}</p>${group.components?.length>1?`<ul class="component-spending">${group.components.map(c=>`<li>${escape(c.label)}: ${escape(formatAUD(c.spending.value,{roundTo:1000}))} estimated annual spend</li>`).join('')}</ul>`:''}</details></div><div class="counts">${group.counts.map(c=>`<div>${!['People','Participants'].includes(c.label)?`<span class="count-label">${escape(c.label)}</span>`:''}<strong>${escape(formatCount(c))}</strong><span class="recipient-rate">${escape(formatRecipientRate(c.rate))}</span></div>`).join('')}${['youth','parenting'].includes(group.id)?`<span class="combined-rate">Combined: ${escape(formatRecipientRate(summary.recipientMeasures.find(metric=>metric.id===group.id).rate))}</span>`:''}</div><div class="payment-money">${escape(formatAUD(group.spending.value,{compact:true}))}${group.additive===false?'<small>Not added to subtotal</small>':''}</div></li>`).join('');
+  $('payment-list').innerHTML=summary.groups.map(group=>`<li class="payment-row"><div class="payment-name">${escape(group.label)}<details><summary>About this payment</summary><p>${escape(group.id==='cra'?'An extra payment to help eligible renters who receive a qualifying payment. Government spending figures already include Rent Assistance within the payments through which it is paid. Its separate estimate is shown for context; adding it to the subtotal would count some spending twice. Some Rent Assistance is paid through programmes outside this selection.':group.description)}</p>${group.components?.length>1?`<ul class="component-spending">${group.components.map(c=>`<li>${escape(c.label)}: ${escape(formatAUD(c.spending.value,{roundTo:1000}))} estimated annual spend</li>`).join('')}</ul>`:''}</details></div><div class="counts">${group.countCoverage==='annual'?`<span class="count-period">People served during FY${escape(group.financialYear.replace('-','–'))}</span>`:''}${group.locationBasis==='service'?'<span class="count-period">By facility location</span>':''}${group.counts.map(c=>`<div>${!['People','Participants'].includes(c.label)?`<span class="count-label">${escape(c.label)}</span>`:''}<strong>${escape(formatCount(c))}</strong><span class="recipient-rate">${escape(formatRecipientRate(c.rate))}</span></div>`).join('')}${['youth','parenting'].includes(group.id)?`<span class="combined-rate">Combined: ${escape(formatRecipientRate(summary.recipientMeasures.find(metric=>metric.id===group.id).rate))}</span>`:''}</div><div class="payment-money">${escape(formatMoneyObservation(group.spending,{compact:true}))}${group.additive===false?`<small>${escape(group.nonAdditiveNote??'Not added to subtotal')}</small>`:''}</div></li>`).join('');
   $('data-issues').hidden=!summary.issues.length;
   $('data-issues').innerHTML=summary.issues.map(issue=>`<li>${escape(issue)}</li>`).join('');
   $('subtotal-label').textContent=summary.totalLabel;
   $('subtotal-money').textContent=formatAUD(summary.total.value,{compact:true});
   $('incomplete-note').hidden=!summary.incomplete;
-  $('incomplete-note').textContent='Some programme data is unavailable or suppressed. The subtotal excludes those unavailable estimates.';
+  $('incomplete-note').textContent='Some programme data is unavailable or suppressed. The subtotal includes known partial estimates; unavailable amounts are not treated as zero.';
   history.replaceState({area:area.id},'',new URL(areaLink(summary,location.origin)).pathname+new URL(areaLink(summary,location.origin)).search);
   $('preview-detail').textContent=area.name;
   status('download-status','');buttons();
@@ -146,7 +163,7 @@ async function updatePreview() {
   $('view-document').textContent=`View and download your ${style}`;
   const content=documentContent(summary,style);
   $('document-text').hidden=false;
-  $('document-text-content').innerHTML=`<h3>${escape(content.area)} — ${escape(content.title)}</h3><p>${escape(content.geography)}<br>${escape(content.period)}<br>${escape(content.countDate)}<br>${escape(content.populationDate)}</p><p><strong>${escape(content.unit)}</strong></p><ul class="document-text-rows">${content.rows.map(row=>`<li><strong>${escape(row.label)}: ${escape(row.money)}</strong><span>${row.countLines.map((line,i)=>`${escape(line)}<br>${escape(row.rateLines[i])}`).join('<br>')}${row.combinedRate?`<br><strong>${escape(row.combinedRate)}</strong>`:''}</span>${row.nonAdditive?'<small>Not added to subtotal</small>':''}</li>`).join('')}</ul><p><strong>${escape(content.totalLabel)}: ${escape(content.total)}</strong></p>${content.footer.map(note=>`<p>${escape(note)}</p>`).join('')}<p><a href="${escape(areaLink(summary,canonicalOrigin))}">View this area and its sources</a> · Release ${escape(summary.releaseId)}</p>`;
+  $('document-text-content').innerHTML=`<h3>${escape(content.area)} — ${escape(content.title)}</h3><p>${escape(content.geography)}<br><strong>${escape(content.scopeLabel)}</strong><br>${escape(content.period)}<br>${escape(content.countDate)}<br>${escape(content.populationDate)}</p><p><strong>${escape(content.unit)}</strong></p><ul class="document-text-rows">${content.rows.map(row=>`<li><strong>${escape(row.label)}: ${escape(row.money)}</strong><span>${row.countLines.map((line,i)=>`${escape(line)}<br>${escape(row.rateLines[i])}`).join('<br>')}${row.combinedRate?`<br><strong>${escape(row.combinedRate)}</strong>`:''}</span>${row.nonAdditive?`<small>${escape(row.nonAdditiveNote)}</small>`:''}</li>`).join('')}</ul><p><strong>${escape(content.totalLabel)}: ${escape(content.total)}</strong></p>${content.footer.map(note=>`<p>${escape(note)}</p>`).join('')}<p><a href="${escape(areaLink(summary,canonicalOrigin))}">View this area and its sources</a> · Release ${escape(summary.releaseId)}</p>`;
   try {
     const canvas=await previewGraphic(summary,style,canonicalOrigin);
     if(version!==previewVersion) return;
@@ -194,6 +211,8 @@ function renderRankings() {
   const rateMode=rankingMetric!=='spending'&&!perPersonMode;
   const ranking=getRanking(rankingType,rankingMetric);
   const percent=rateMode&&['people','participants'].includes(ranking.metric.unit);
+  const annualRate=rateMode&&release.areas.some(area=>area.groups.some(group=>group.id===ranking.metric.group&&group.countCoverage==='annual'));
+  const countPeriod=annualRate?`People served during FY${release.financialYear.replace('-','–')}`:`${formatSourceDate(release.countDate)} recipients`;
   const query=$('ranking-search').value.trim();
   const ids=query?new Set(searchAreas(query,ranking.rows.map(row=>row.area)).map(area=>area.id)):null;
   const rows=ids?ranking.rows.filter(row=>ids.has(row.area.id)):ranking.rows;
@@ -201,13 +220,14 @@ function renderRankings() {
   rankingPage=Math.min(rankingPage,pages-1);
   const start=rankingPage*rankingPageSize;
   $('ranking-area-heading').textContent=rankingType==='ced'?'Federal division':'Council area (LGA)';
-  $('ranking-year').textContent=rateMode?formatSourceDate(release.countDate):`FY${release.financialYear.replace('-','–')}`;
-  $('ranking-intro').textContent=rateMode?`Highest to lowest ${ranking.metric.label} ${percent?'recipient percentage of all residents':`${ranking.metric.unit==='families'?'families':'income units'} per 1,000 residents`}. ${formatSourceDate(release.countDate)} recipients use ABS ${formatSourceDate(release.populationDate)} population. These are approximate rates, not eligibility rates.`:perPersonMode?`Highest to lowest estimated annual spending per person on the selected payments. Total annual spending is divided by ABS ${formatSourceDate(release.populationDate)} population, including all residents and children. Rent Assistance is not added twice.`:`Highest to lowest estimated total annual spending on the selected payments. Larger areas can spend more because they have more residents. Rent Assistance is not added twice. Population figures are ABS ${formatSourceDate(release.populationDate)} estimates.`;
+  $('ranking-year').textContent=rateMode&&!annualRate?formatSourceDate(release.countDate):`FY${release.financialYear.replace('-','–')}`;
+  $('ranking-scope').textContent=release.scope.label+(welfareScope==='all'&&release.areas.some(area=>area.groups.some(group=>group.overlapWith))?' · Spending subtotals and ranks exclude residential aged care, which is shown separately because it can overlap NDIS.':'');
+  $('ranking-intro').textContent=rateMode?`Highest to lowest ${ranking.metric.label} ${percent?'recipient percentage of all residents':`${ranking.metric.unit==='families'?'families':'income units'} per 1,000 residents`}. ${countPeriod} use ABS ${formatSourceDate(release.populationDate)} population. These are approximate rates, not eligibility rates.`:perPersonMode?`Highest to lowest estimated annual spending per person on the selected payments. Total annual spending is divided by ABS ${formatSourceDate(release.populationDate)} population, including all residents and children. Rent Assistance is not added twice.`:`Highest to lowest estimated total annual spending on the selected payments. Larger areas can spend more because they have more residents. Rent Assistance is not added twice. Population figures are ABS ${formatSourceDate(release.populationDate)} estimates.`;
   $('ranking-value-heading').textContent=rateMode?(percent?'% of residents':`${ranking.metric.unit==='families'?'Families':'Income units'} / 1,000`):perPersonMode?'Annual $ / person':'Annual spending';
   $('ranking-caption').textContent=rateMode?`National ${ranking.metric.label} recipient-rate rankings`:perPersonMode?'National rankings by estimated annual spending per person':'National rankings by total estimated annual spending for selected payments';
   $('ranking-count').textContent=`${ranking.rankedCount} of ${ranking.totalCount} ${rankingType==='ced'?'divisions':'LGAs'} ranked. ${ranking.totalCount-ranking.rankedCount?`${ranking.totalCount-ranking.rankedCount} have unavailable ${rateMode?'recipient rates':perPersonMode?'complete per-person estimates':'totals'} and are listed as unranked.`:'All have complete estimates.'}`;
   $('ranking-results').textContent=rows.length?`Showing ${start+1}–${Math.min(start+rankingPageSize,rows.length)} of ${rows.length} areas${query?' matching your search':''}. Ranks are national within the selected area type.`:'No matching areas. Try a name, state or four-digit postcode.';
-  $('ranking-rows').innerHTML=rows.slice(start,start+rankingPageSize).map(row=>`<tr${row.area.id===selected?.id?' class="selected-ranking"':''}><td class="rank-number">${row.rank===null?'Unranked':`#${row.rank}`}</td><th scope="row"><a href="${escape(areaLink({area:row.area,releaseId:release.id},canonicalOrigin))}" data-ranking-area="${escape(row.area.id)}"${row.area.id===selected?.id?' aria-current="true"':''}>${escape(row.area.name)}<span>${escape(row.area.state)} · ${row.populationAvailable?`${row.area.population.value.toLocaleString('en-AU')} residents`:'Compatible population unavailable'}</span></a></th><td class="rank-spending"><strong>${escape(rateMode?formatRecipientRate(row.rate,{compact:true}):perPersonMode?formatAUD(row.perResident.value):formatAUD(row.total.value,{compact:true}))}</strong><small>${rateMode?escape(formatCount(row.count)):perPersonMode?row.eligible?`${escape(formatAUD(row.total.value,{compact:true}))} total`:row.populationAvailable?'Known subtotal · incomplete':'Population unavailable':row.eligible?escape(formatAUD(row.total.value,{roundTo:1000})):'Known subtotal · incomplete'}</small></td></tr>`).join('');
+  $('ranking-rows').innerHTML=rows.slice(start,start+rankingPageSize).map(row=>`<tr${row.area.id===selected?.id?' class="selected-ranking"':''}><td class="rank-number">${row.rank===null?'Unranked':`#${row.rank}`}</td><th scope="row"><a href="${escape(areaLink({area:row.area,releaseId:release.id,scope:release.scope},canonicalOrigin))}" data-ranking-area="${escape(row.area.id)}"${row.area.id===selected?.id?' aria-current="true"':''}>${escape(row.area.name)}<span>${escape(row.area.state)} · ${row.populationAvailable?`${row.area.population.value.toLocaleString('en-AU')} residents`:'Compatible population unavailable'}</span></a></th><td class="rank-spending"><strong>${escape(rateMode?formatRecipientRate(row.rate,{compact:true}):perPersonMode?formatAUD(row.perResident.value):formatAUD(row.total.value,{compact:true}))}</strong><small>${rateMode?escape(formatCount(row.count)):perPersonMode?row.eligible?`${escape(formatAUD(row.total.value,{compact:true}))} total`:row.populationAvailable?'Known subtotal · incomplete':'Population unavailable':row.eligible?escape(formatAUD(row.total.value,{roundTo:1000})):'Known subtotal · incomplete'}</small></td></tr>`).join('');
   $('ranking-footnote').textContent=rateMode?'Rates are shown only when the selected payment counts and a compatible positive population are available. Families and income units are not people percentages. Youth Allowance and Parenting Payment combine their separate individual categories; FTB Parts A and B stay separate. Payment shares can overlap and are not added together. Rankings use unrounded rates; exact ties share a rank.':perPersonMode?'Per-person values divide the annual programme total by all residents, including children. Incomplete totals or incompatible population estimates receive no rank. Displayed dollars are rounded; ranks use full precision and exact ties share a rank.':'Areas with missing or suppressed programme amounts retain their known subtotal, but receive no rank. Rankings use unrounded totals; displayed amounts are rounded. Exact ties share a rank. Select an area to see its counts and download its receipt or invoice.';
   $('ranking-prev').disabled=rankingPage===0;
   $('ranking-next').disabled=rankingPage>=pages-1;
@@ -215,6 +235,14 @@ function renderRankings() {
   for(const button of document.querySelectorAll('[data-ranking-type]'))button.setAttribute('aria-pressed',String(button.dataset.rankingType===rankingType));
 }
 window.addEventListener('pagehide',clearDownload);
+for(const button of document.querySelectorAll('[data-scope]'))button.addEventListener('click',async()=>{
+  if(!baseRelease||exporting||button.dataset.scope===welfareScope)return;
+  clearDownload();closeSuggestions();welfareScope=button.dataset.scope;
+  const areaId=selected?.id;
+  configureScope();renderRankings();
+  if(areaId)await selectArea(release.areas.find(area=>area.id===areaId),false);
+  else {const url=new URL(location.href);if(welfareScope==='all')url.searchParams.delete('scope');else url.searchParams.set('scope',welfareScope);history.replaceState(null,'',url.pathname+url.search);}
+});
 $('search-form').addEventListener('submit',event=>{event.preventDefault();search();});
 $('search-form').addEventListener('focusout',event=>{if(!$('search-form').contains(event.relatedTarget))closeSuggestions();});
 $('area-search').addEventListener('input',event=>{if(event.isComposing)return;if(release&&$('area-search').value.trim().length>=2)search();else closeSuggestions();});

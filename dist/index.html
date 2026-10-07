@@ -24,6 +24,15 @@
       <div><h1 id="page-title">Your area's<br>welfare bill.</h1><p>Explore who receives support and how much is spent. Find your area, then download a receipt or invoice.</p></div>
       <div class="intro-note"><span class="data-dot" aria-hidden="true"></span><span>National expenditure. Local estimates.<br><strong id="financial-year">Financial year 2024–25</strong></span></div>
     </section>
+    <section class="scope-picker" aria-label="Welfare programme group">
+      <p class="scope-label">Which programmes?</p>
+      <div class="scope-buttons" role="group" aria-label="Choose welfare programmes" aria-describedby="scope-description">
+        <button type="button" data-scope="all" aria-pressed="true" disabled>All selected welfare</button>
+        <button type="button" data-scope="working" aria-pressed="false" disabled>Working-age &amp; family support</button>
+        <button type="button" data-scope="retirement" aria-pressed="false" disabled>Retirement &amp; aged care</button>
+      </div>
+      <p id="scope-description" class="help"></p>
+    </section>
     <div class="workspace">
       <div class="explorer">
         <section class="search-section" aria-labelledby="search-heading">
@@ -42,7 +51,7 @@
         </section>
         <section id="area-summary" class="area-summary" aria-labelledby="area-name" hidden>
           <div class="area-heading"><div><p id="area-type" class="area-type"></p><h2 id="area-name" tabindex="-1"></h2><p id="area-population" class="help"></p></div><button id="change-area" type="button" class="text-button">Change area</button></div>
-          <div class="area-total"><div class="summary-metrics"><div class="spending-metric"><p id="total-spending-label" class="metric-label">Estimated total annual spending</p><strong id="total-spending-value" class="metric-value"></strong><p id="total-spending-exact" class="total-exact"></p><p id="area-spending-rank" class="total-rank"></p><a href="#rankings" data-ranking-metric="spending">Compare totals <span aria-hidden="true">↓</span></a></div><div class="spending-metric"><p id="per-person-label" class="metric-label">Estimated annual spend per person</p><strong id="per-person-value" class="metric-value"></strong><p id="per-person-context" class="total-exact"></p><p id="per-person-rank" class="total-rank"></p><a href="#rankings" data-ranking-metric="per-resident">Compare per person <span aria-hidden="true">↓</span></a></div></div><p class="total-note">Selected payments. Per-person spending uses all residents, including children. Rent Assistance is already embedded in primary payments and is not added again.</p></div>
+          <div class="area-total"><div class="summary-metrics"><div class="spending-metric"><p id="total-spending-label" class="metric-label">Estimated total annual spending</p><strong id="total-spending-value" class="metric-value"></strong><p id="total-spending-exact" class="total-exact"></p><p id="area-spending-rank" class="total-rank"></p><a href="#rankings" data-ranking-metric="spending">Compare totals <span aria-hidden="true">↓</span></a></div><div class="spending-metric"><p id="per-person-label" class="metric-label">Estimated annual spend per person</p><strong id="per-person-value" class="metric-value"></strong><p id="per-person-context" class="total-exact"></p><p id="per-person-rank" class="total-rank"></p><a href="#rankings" data-ranking-metric="per-resident">Compare per person <span aria-hidden="true">↓</span></a></div></div><p id="total-note" class="total-note">Per-person spending uses all residents, including children. Rent Assistance is not added again.</p></div>
           <p id="recipient-rate-context" class="rate-context"></p>
           <div class="summary-caption"><span id="recipient-date">Recipients at June 2025</span><span id="spending-year">Estimated spend in 2024–25</span></div>
           <div class="payment-heading" aria-hidden="true"><span>Payment</span><span>Recipients</span><span>Annual spend</span></div>
@@ -50,8 +59,8 @@
           <div class="subtotal"><div><strong id="subtotal-label">Programme subtotal</strong><p>Rent Assistance is not added again.</p></div><strong id="subtotal-money"></strong></div>
           <p id="incomplete-note" class="inline-note" hidden></p>
           <ul id="data-issues" class="inline-note" hidden></ul>
-          <p class="summary-footnote">Recipient counts can overlap. This selection covers nine welfare payment groups, rather than all welfare spending. Local spending figures are estimates.</p>
-          <p class="rate-context">FTB counts families and Rent Assistance counts income units, so their rates are per 1,000 residents, rather than percentages of people. <a href="#rankings" data-ranking-metric="jobseeker">Compare recipient rates in the rankings.</a></p>
+          <p class="summary-footnote">Recipient counts can overlap. These are selected payments and services, rather than all welfare spending. Local spending figures are estimates.</p>
+          <p class="rate-context">FTB counts families and Rent Assistance counts income units, so their rates are per 1,000 residents, rather than percentages of people. <a id="compare-recipient-rates" href="#rankings" data-ranking-metric="jobseeker">Compare recipient rates in the rankings.</a></p>
           <button id="view-document" class="secondary mobile-preview-link" type="button">View and download your receipt</button>
         </section>
       </div>
@@ -77,6 +86,7 @@
       <div class="rankings-heading"><div><p class="area-type">Compare Australia</p><h2 id="rankings-title">Spending &amp; recipient rankings</h2></div><span id="ranking-year"></span></div>
       <p id="ranking-intro" class="rankings-intro">Highest to lowest estimated total annual spending on the selected payments.</p>
       <p id="rankings-loading" class="status">Loading spending rankings…</p>
+      <p id="ranking-scope" class="help"></p>
       <div id="rankings-content" hidden>
         <div class="ranking-metric-control"><label for="ranking-metric">Rank by</label><select id="ranking-metric"><option value="spending">Total annual spending</option><option value="per-resident">Annual spending per person</option></select></div>
         <div class="rankings-controls"><div class="filters ranking-tabs" role="group" aria-label="Ranking area type"><button type="button" data-ranking-type="ced" aria-pressed="true">Federal divisions</button><button type="button" data-ranking-type="lga" aria-pressed="false">LGAs</button></div><div class="ranking-search"><label for="ranking-search">Find an area in the rankings</label><input id="ranking-search" type="search" placeholder="Area, state or postcode" autocomplete="off" aria-describedby="ranking-results"></div></div>
