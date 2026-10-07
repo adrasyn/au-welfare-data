@@ -64,7 +64,13 @@ The search-dropdown update passes all 60 tests. Six new tests were observed fail
 
 The per-person summary/rank update passes all 65 tests. Five new tests were first observed failing and cover population-normalised ordering, separate geography groups, incomplete/invalid denominators, precision/ties, CRA exclusion and receipt consistency. Browser checks confirm Sydney's $3,096/#145 of 150 divisions and Armidale's $8,380/#208 of 508 LGAs, matching their filtered ranking rows; Maralinga Tjarutja retains a known subtotal without rank. Summaries fit 320/375/430px widths without number or page overflow, and recipient-percentage modes still work. An independent review found no critical or important findings. Its two minor issues (unranked explanation and compare-link geography context) were corrected; the latter was reproduced and then checked in the browser.
 
-`.openai/hosting.json` points to the owner-private Sites project. Publication uses the native Sites source helper and a saved version of the exact pushed source. Keep the audience private until the owner requests public access.
+### GitHub Pages
+
+Public source: [adrasyn/au-welfare-data](https://github.com/adrasyn/au-welfare-data). Production domain: `https://auwelfaredata.wlsn.me`.
+
+Push changes to `main` to publish. `.github/workflows/pages.yml` installs the locked dependencies, runs every test, rebuilds the local PDF/QR bundle and deploys only `dist/` to GitHub Pages. Pull requests run the same checks without deploying. Frozen data is checked in; publication does not acquire or change government source data. Configure the repository's Pages source as **GitHub Actions** and set the custom domain to `auwelfaredata.wlsn.me` in Pages settings; Actions deployments do not use `dist/CNAME` to configure that setting.
+
+For DNS, add `auwelfaredata` as a **CNAME** pointing to `adrasyn.github.io` in the `wlsn.me` zone. Once GitHub validates DNS and issues its certificate, enable **Enforce HTTPS** in Pages settings. Share links and document QR codes use the custom production domain, so they require that DNS setup. The earlier owner-private Sites preview is separate and is no longer the publishing target for this checkout.
 
 The programme-scope/aged-care update passes 81 tests, including source preservation, programme-specific allocation, annual dates, overlap handling, partial counts/spending, scope links and complete-only ranks. All ranks cover 139 divisions/497 LGAs, working-age ranks 150/508, and retirement ranks 133/493. Browser QA covers three mobile widths, both geography types, complete Armidale and incomplete Sydney, annual-care rankings, and search retaining the scope. Actual PNG/PDF exports were captured through a temporary localhost hook removed before publication. Long invoices retain readable type on multiple A4 pages; page boundaries and QR placement were visually checked. Physical phone keyboard and screen-reader execution remain untested.
 

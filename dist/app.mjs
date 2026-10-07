@@ -5,7 +5,7 @@ import { previewGraphic, exportGraphic, saveBlob } from './lib/download.mjs';
 import {buildRankings} from './lib/rankings.mjs';
 import {filterRelease,scopeFor} from './lib/scopes.mjs';
 
-const canonicalOrigin='https://benefits-data-australia.vvlsn.chatgpt.site';
+const canonicalOrigin='https://auwelfaredata.wlsn.me';
 const $=id=>document.getElementById(id);
 const escape=text=>String(text??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let release,selected,summary,style='receipt',matches=[],previewVersion=0,exporting=false,downloadUrl;

@@ -37,7 +37,7 @@ test('export dates follow their actual source metadata rather than fixed labels'
   assert.match(content.countDate,/March 2024/);
   assert.match(content.populationDate,/June 2023/);
 });
-test('share and QR links use the verified production origin',async()=>{
+test('share and QR links use the custom production domain',async()=>{
   const app=await readFile(new URL('../dist/app.mjs',import.meta.url),'utf8');
-  assert.equal(app.match(/const canonicalOrigin='([^']+)'/)?.[1],'https://benefits-data-australia.vvlsn.chatgpt.site');
+  assert.equal(app.match(/const canonicalOrigin='([^']+)'/)?.[1],'https://auwelfaredata.wlsn.me');
 });

@@ -5,3 +5,4 @@ tmp/
 outputs/
 *.tar.gz
 .DS_Store
+.openai/
