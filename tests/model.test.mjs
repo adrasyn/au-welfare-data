@@ -51,6 +51,9 @@ test('true zero is displayed, while a missing value is unavailable',()=>{
   assert.equal(formatAUD(0),'$0');
   assert.equal(formatAUD(null),'Unavailable');
 });
+test('billion-dollar area totals use readable billion units in compact displays',()=>{
+  assert.equal(formatAUD(6363265382.837656,{compact:true}),'$6.4b');
+});
 test('count geography mismatch withholds that payment estimate and explains it',()=>{
   const payment=group('ndis',500);payment.counts[0].geographyVintage='LGA2025';
   const result=buildSummary(area([group('job',1000),payment]));

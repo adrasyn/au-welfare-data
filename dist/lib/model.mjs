@@ -3,6 +3,7 @@ const currency = new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD',
 
 export function formatAUD(value,{compact=false,roundTo=1}={}) {
   if (value===null || value===undefined || !Number.isFinite(value)) return 'Unavailable';
+  if(compact && Math.abs(value)>=1e9) return `$${(value/1e9).toLocaleString('en-AU',{maximumFractionDigits:1})}b`;
   if(compact && Math.abs(value)>=1e6) return `$${(value/1e6).toLocaleString('en-AU',{maximumFractionDigits:1})}m`;
   return currency.format(Math.round(value/roundTo)*roundTo);
 }

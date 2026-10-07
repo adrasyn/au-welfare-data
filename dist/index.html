@@ -17,7 +17,7 @@
       <svg class="brand-mark" width="36" height="40" viewBox="0 0 36 40" aria-hidden="true"><path d="M6 3h24v34l-4-3-4 3-4-3-4 3-4-3-4 3V3Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 12h12M12 19h12M12 26h6" stroke="currentColor" stroke-width="2"/></svg>
       <span>Benefits Data<span class="brand-country">Australia</span></span>
     </a>
-    <nav aria-label="Main"><a href="#method">How we calculate</a><a href="#sources">Data sources</a></nav>
+    <nav aria-label="Main"><a href="#method">How we calculate</a><a href="#rankings">Rankings</a><a href="#sources">Data sources</a></nav>
   </header>
   <main id="main">
     <section class="intro" aria-labelledby="page-title">
@@ -44,6 +44,7 @@
         </section>
         <section id="area-summary" class="area-summary" aria-labelledby="area-name" hidden>
           <div class="area-heading"><div><p id="area-type" class="area-type"></p><h2 id="area-name" tabindex="-1"></h2><p id="area-population" class="help"></p></div><button id="change-area" type="button" class="text-button">Change area</button></div>
+          <div class="area-total"><p id="total-spending-label">Estimated total annual spending</p><strong id="total-spending-value"></strong><p id="total-spending-exact" class="total-exact"></p><p id="area-spending-rank" class="total-rank"></p><a href="#rankings">Compare areas in the spending rankings <span aria-hidden="true">↓</span></a><p class="total-note">Selected payments. Rent Assistance is already embedded in primary payments and is not added again.</p></div>
           <div class="summary-caption"><span id="recipient-date">Recipients at June 2025</span><span id="spending-year">Estimated spend in 2024–25</span></div>
           <div class="payment-heading" aria-hidden="true"><span>Payment</span><span>Recipients</span><span>Annual spend</span></div>
           <ul id="payment-list" class="payment-list"></ul>
@@ -72,6 +73,19 @@
         <a id="save-file" class="save-file" hidden>Save prepared file</a>
       </aside>
     </div>
+    <section id="rankings" class="rankings-section" aria-labelledby="rankings-title">
+      <div class="rankings-heading"><div><p class="area-type">Compare Australia</p><h2 id="rankings-title">Spending rankings</h2></div><span id="ranking-year"></span></div>
+      <p class="rankings-intro">Highest to lowest estimated total annual spending on the selected payments. Larger areas can spend more because they have more residents. Rent Assistance is not added twice.</p>
+      <p id="rankings-loading" class="status">Loading spending rankings…</p>
+      <div id="rankings-content" hidden>
+        <div class="rankings-controls"><div class="filters ranking-tabs" role="group" aria-label="Ranking area type"><button type="button" data-ranking-type="ced" aria-pressed="true">Federal divisions</button><button type="button" data-ranking-type="lga" aria-pressed="false">LGAs</button></div><div class="ranking-search"><label for="ranking-search">Find an area in the rankings</label><input id="ranking-search" type="search" placeholder="Area, state or postcode" autocomplete="off" aria-describedby="ranking-results"></div></div>
+        <p id="ranking-count" class="help"></p>
+        <p id="ranking-results" class="status" role="status" aria-live="polite"></p>
+        <table class="ranking-table"><caption class="visually-hidden">National rankings by total estimated annual spending for selected payments</caption><thead><tr><th scope="col">Rank</th><th id="ranking-area-heading" scope="col">Federal division</th><th scope="col">Annual spending</th></tr></thead><tbody id="ranking-rows"></tbody></table>
+        <div class="ranking-pagination"><button id="ranking-prev" class="secondary" type="button">Previous</button><span id="ranking-page"></span><button id="ranking-next" class="secondary" type="button">Next</button></div>
+        <p class="help">Areas with missing or suppressed programme amounts retain their known subtotal, but receive no rank. Rankings use unrounded totals; displayed amounts are rounded. Exact ties share a rank. Select an area to see its counts and download its receipt or invoice.</p>
+      </div>
+    </section>
     <section class="about-data" aria-label="About these figures">
       <details id="method"><summary>How are these figures calculated?</summary><div class="method-content"><p id="method-allocation"></p><p id="method-counts"></p><p id="method-geography"></p><p id="method-overlap"></p><p id="method-population"></p><p>Figures are frozen to data release <strong id="data-release">2024-25-v1</strong>. A postcode uses ABS Postal Area approximations and can span several areas. PO Box-only postcodes may not be represented; search by area name instead.</p></div></details>
       <details id="sources"><summary>View the data sources</summary><ul id="source-list"></ul></details>

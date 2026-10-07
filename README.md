@@ -2,6 +2,8 @@
 
 A search-first Australian benefit receipt and invoice generator. Covers nine selected benefit groups across 150 federal electorates and 547 ABS council/statistical local areas, with postcode choices, source recipient counts and estimated spending. Mobile uses search and a stacked document preview; this release has no map.
 
+Each selected area now shows its estimated total annual spending and its national rank within its area type. The spending rankings compare federal divisions and LGAs separately, highest first, with name/state/postcode search and pagination. Filters retain national ranks. Exact unrounded ties share a competition rank. All 150 divisions and 508 of 547 LGAs have complete estimates; the other 39 LGAs are visible with known subtotals and no rank, because one or more programme amounts are missing or suppressed. CRA is excluded from addition throughout.
+
 ## Run locally
 
 ```sh
@@ -39,6 +41,8 @@ Preserve existing published release files: a new financial year or corrected sou
 Unit tests exercise suppression, zero/missing counts, ABS ratio allocation, FTB overlap, CRA non-addition, period/population mismatches, ambiguous postcodes, leading zeros, pinned URLs and consistent document contents. Browser QA checked 320/375/430-pixel mobile widths and desktop, an electorate and a regional council, and both export formats. Eight generated PNG/PDF files were inspected via a temporary localhost capture because the in-app browser did not expose saved-download events; that capture was removed before publication. QR codes decoded to the exact pinned area URLs. Responsive-browser checks do not replace testing a physical phone or its software keyboard.
 
 The final review fixes and verified-production-origin regression pass all 36 tests. A fresh checkout without `.cache/` successfully installs and builds. Browser regression checks confirm a missing population keeps the area invoice usable, while disabling per-resident downloads. The receipt/invoice text disclosure follows the selected style and matches the image. Detailed FTB Part A/B expenditure reconciles to its combined amount before rounding. Allocation metadata is validated at preparation and display, with incompatible estimates withheld and explained. Final QR links use the native deployment's verified production origin. See [the verification record](docs/verification.md) for decisions and limits.
+
+The totals/rankings update passes 42 automated tests, including separate geography rankings, full-precision ties, incompatible/incomplete observations, CRA exclusion and production snapshot reconciliation. Browser checks cover national rank preservation under search, tab switching, pagination, selection of both complete and incomplete areas, and no overflow at 320/375/430 pixels. An independent read-only review found no critical or important issues. Its two minor findings were corrected: selecting an area retains the ranking page, and navigation uses the CSS reduced-motion preference.
 
 `.openai/hosting.json` points to the owner-private Sites project. Publication uses the native Sites source helper and a saved version of the exact pushed source. Keep the audience private until the owner requests public access.
 
