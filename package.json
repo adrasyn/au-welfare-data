@@ -1,0 +1,20 @@
+{
+  "name": "benefits-data-australia",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "data:acquire": "node scripts/acquire-data.mjs",
+    "data:prepare": "node scripts/prepare-data.mjs",
+    "build": "node scripts/vendor.mjs",
+    "dev": "node scripts/serve.mjs",
+    "preview": "node scripts/serve.mjs"
+  },
+  "dependencies": {
+    "csv-parse": "7.0.3",
+    "jspdf": "4.2.1",
+    "qrcode": "1.5.4"
+  },
+  "devDependencies": { "esbuild": "0.28.2" }
+}
