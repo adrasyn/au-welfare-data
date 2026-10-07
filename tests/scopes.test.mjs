@@ -67,6 +67,30 @@ test('residential care is separately displayed with NDIS but additive in retirem
   assert.match(documentContent(buildSummary(all.areas[0],all),'invoice').footer.join(' '),/NDIS can reimburse/);
   assert.equal(input.areas[0].groups[2].additive,true);
 });
+test('an explicit gross inclusion policy carries aged care into totals, per-person values, ranks and exports',()=>{
+  const input={...release,areas:[area('gross',[group('age',200),group('ndis',100),{...group('aged-care-residential',50),overlapWith:'ndis',overlapPolicy:'include-gross'},group('cra',20)]),area('other',[group('age',325)])]};
+  const all=filterRelease(input,'all'),retirement=filterRelease(input,'retirement'),working=filterRelease(input,'working');
+  const summary=buildSummary(all.areas[0],all);
+  assert.equal(summary.total.value,350);
+  assert.equal(summary.totalPerResident.value,0.35);
+  assert.equal(buildSummary(retirement.areas[0],retirement).total.value,250);
+  assert.equal(buildSummary(working.areas[0],working).total.value,100);
+  assert.deepEqual(buildRankings(all,'lga').rows.map(row=>[row.area.name,row.rank]),[['gross',1],['other',2]]);
+  for(const style of ['receipt','invoice']){
+    const document=documentContent(summary,style);
+    assert.equal(document.rows.find(row=>row.label==='aged-care-residential').nonAdditive,false);
+    assert.match(document.footer.join(' '),/overlap is not deducted/);
+  }
+});
+test('gross inclusion never turns missing aged-care expenditure into a complete ranked total',()=>{
+  const care={...group('aged-care-residential',null),overlapWith:'ndis',overlapPolicy:'include-gross'};
+  const input=filterRelease({...release,areas:[area('missing',[group('age',200),group('ndis',100),care,group('cra',20)])]});
+  const summary=buildSummary(input.areas[0],input);
+  assert.equal(summary.total.value,300);
+  assert.equal(summary.incomplete,true);
+  assert.equal(buildRankings(input,'lga').rankedCount,0);
+  assert.equal(buildRankings(input,'lga','per-resident').rankedCount,0);
+});
 test('known partial care counts and spending remain visible without gaining a complete rank',()=>{
   const partial={...group('aged-care-support',null),counts:[{...group('aged-care-support').counts[0],value:null,status:'unavailable',knownSubtotal:25}],spending:{...group('aged-care-support').spending,value:null,status:'unavailable',knownSubtotal:50000}};
   const input={...release,areas:[area('partial',[group('age',100),partial])]};

@@ -27,6 +27,14 @@ test('area cards use the same per-person amount and programme scope as the recei
   assert.match(all.description,/residential aged care excluded/i);
   assert.match(socialSvg(all),/Armidale/);
 });
+test('gross-inclusion shares use the new release amount and disclose its accounting policy',async()=>{
+  const base=JSON.parse(await readFile(new URL('../dist/data/releases/2024-25-v3.json',import.meta.url)));
+  const scoped=filterRelease(base),card=socialPreview(buildSummary(scoped.areas.find(area=>area.id==='lga:10180'),scoped),origin);
+  assert.equal(card.amount,'$9,738');
+  assert.match(card.url,/2024-25-v3\/all\/$/);
+  assert.match(card.description,/overlap is not deducted/);
+  assert.doesNotMatch(card.description,/aged care excluded/);
+});
 test('incomplete and unavailable amounts cannot appear as a complete average or zero',()=>{
   const partial=socialPreview(summary('ced:141','retirement'),origin);
   assert.match(partial.metric,/known/i);assert.match(partial.description,/incomplete/i);

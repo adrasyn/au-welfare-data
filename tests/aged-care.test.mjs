@@ -7,6 +7,37 @@ import {filterRelease} from '../dist/lib/scopes.mjs';
 import {buildRankings} from '../dist/lib/rankings.mjs';
 const original=JSON.parse(await readFile(new URL('../dist/data/releases/2024-25-v1.json',import.meta.url)));
 const data=JSON.parse(await readFile(new URL('../dist/data/releases/2024-25-v2.json',import.meta.url)));
+const grossData=JSON.parse(await readFile(new URL('../dist/data/releases/2024-25-v3.json',import.meta.url)));
+test('the gross-inclusion release preserves the original observations and changes only residential accounting',()=>{
+  assert.equal(validateRelease(grossData),true);
+  assert.equal(grossData.areas.length,data.areas.length);
+  for(const area of grossData.areas){
+    const old=data.areas.find(old=>old.id===area.id);
+    assert.deepEqual(area.population,old.population);
+    for(const group of area.groups){
+      const previous=old.groups.find(old=>old.id===group.id);
+      assert.deepEqual(group.counts,previous.counts);
+      assert.deepEqual(group.spending,previous.spending);
+      assert.deepEqual(group.allocation,previous.allocation);
+      if(group.id!=='aged-care-residential')assert.deepEqual(group,previous);
+    }
+  }
+});
+test('v3 totals gain residential care while old shared releases retain their original figures',()=>{
+  const old=filterRelease(data),current=filterRelease(grossData);
+  const summary=buildSummary(current.areas.find(area=>area.id==='lga:10180'),current);
+  assert.ok(Math.abs(summary.total.value-288700265.71766406)<0.001);
+  assert.ok(Math.abs(summary.totalPerResident.value-9738.253582866628)<0.001);
+  assert.ok(Math.abs(buildSummary(old.areas.find(area=>area.id==='lga:10180'),old).total.value-261765917.81139463)<0.001);
+  const expected={all:[133,472],working:[150,508],retirement:[133,493]};
+  for(const [scope,counts] of Object.entries(expected)){
+    const scoped=filterRelease(grossData,scope);
+    for(const [index,type] of ['ced','lga'].entries()){
+      assert.equal(buildRankings(scoped,type).rankedCount,counts[index]);
+      assert.equal(buildRankings(scoped,type,'per-resident').rankedCount,counts[index]);
+    }
+  }
+});
 test('the aged-care release preserves original programmes and their dated population',()=>{
   assert.equal(validateRelease(data),true);
   assert.equal(data.areas.length,697);

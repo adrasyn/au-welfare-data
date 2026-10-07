@@ -82,3 +82,13 @@ The [2024–25 Report on the Operation of the Aged Care Act](https://www.gen-age
 Sydney's incomplete residential and CHSP estimates arise from missing spatial SA3 10803 (Lord Howe Island) records. Its home-care source row exists. Official ABS correspondences transfer a positive Lord Howe share through CED2021 Sydney to CED2024 Sydney. The missing record cannot be treated as zero; Sydney retains known partial amounts and remains unranked for complete retirement spending.
 
 Frozen v2 preserves v1 unchanged. Ranked complete coverage by group is All **139 CED / 497 LGA**, Working-age **150 / 508**, Retirement **133 / 493**. Percentage denominators remain all June2024 residents, not an age-specific population. Programme groups are not actual recipient age bands.
+
+## v3: include gross residential spending
+
+The user requested inclusion if the reimbursement overlap is small, with disclosure in the calculation methodology. This supersedes the conservative v2 exclusion policy for new links; v1 and v2 remain frozen.
+
+The [NDIA 2024–25 actuarial report, printed page 220](https://www.ndis.gov.au/media/8183/download?attachment=) says off-system payments, including residential care and taxi subsidies, account for less than 1% of Scheme expenditure. Using [NDIA participant-plan expenses of $46,352.178m](https://ndis.gov.au/media/8108/download?attachment=), that suggests a scale below approximately $463.5m, or 1.93% of the $23,965.6m residential total (1.29% of the three included aged-care programmes). This is an indicative comparison, not an audited exact overlap or a local-area ceiling: the report does not provide a matched annual residential-care-only offset. The Health report's $507.063m bundled recoveries and NDIA's $725.7m year-end payable must not be substituted for that offset.
+
+`scripts/include-residential-care.mjs` clones v2 into v3, preserving every count, expenditure estimate and population. It marks residential care `overlapPolicy: include-gross`, making it additive in All even with NDIS present. Rent Assistance remains non-additive. The methodology, standalone exports and social descriptions disclose that no reimbursement overlap is deducted. No invented national or local deduction is applied.
+
+All ranks now require residential-care coverage: **133 CED / 472 LGA**. Working-age (**150 / 508**) and retirement (**133 / 493**) coverage stays the same. Areas with incomplete care data retain known subtotals without receiving a complete-total or per-person rank. Armidale All increases from $261,765,917.8114 to $288,700,265.7177, or $9,738 per resident rounded, while its old v2 share retains $8,830.

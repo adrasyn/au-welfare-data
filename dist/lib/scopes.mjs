@@ -15,6 +15,6 @@ export function filterRelease(release,id='all') {
     return scope.id==='retirement'?retirement:!retirement;
     });
     if(scope.id==='retirement')groups.sort((a,b)=>Number(a.id==='cra')-Number(b.id==='cra'));
-    return {...area,groups:groups.map(group=>group.overlapWith?{...group,additive:!groups.some(other=>other.id===group.overlapWith),nonAdditiveNote:'Shown separately: can overlap NDIS'}:group)};
+    return {...area,groups:groups.map(group=>group.overlapWith?{...group,additive:group.overlapPolicy==='include-gross'||!groups.some(other=>other.id===group.overlapWith),nonAdditiveNote:'Shown separately: can overlap NDIS'}:group)};
   })};
 }
