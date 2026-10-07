@@ -4,12 +4,13 @@ import { documentContent, areaLink, exportFilename } from './lib/render.mjs';
 import { previewGraphic, exportGraphic, saveBlob } from './lib/download.mjs';
 import {buildRankings} from './lib/rankings.mjs';
 import {filterRelease,scopeFor} from './lib/scopes.mjs';
+import {readAreaLink} from './lib/urls.mjs';
 
 const canonicalOrigin='https://auwelfaredata.wlsn.me';
 const $=id=>document.getElementById(id);
 const escape=text=>String(text??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let release,selected,summary,style='receipt',matches=[],previewVersion=0,exporting=false,downloadUrl;
-let baseRelease,welfareScope=scopeFor(new URL(location.href).searchParams.get('scope')).id;
+let baseRelease,welfareScope=scopeFor(readAreaLink(location.href).scope).id;
 let postcodes=[],activeSuggestion=-1;
 let rankings,rankingType='ced',rankingPage=0;
 let rankingMetric='spending';
@@ -40,8 +41,8 @@ function configureScope() {
 async function loadData(current=false) {
   status('search-status','Loading area data…');$('retry').hidden=true;
   try {
-    const parameters=new URL(location.href).searchParams;
-    const requested=current?null:parameters.get('release');
+    const parameters=readAreaLink(location.href);
+    const requested=current?null:parameters.releaseId;
     if(requested&&!/^[a-z0-9-]+$/i.test(requested)) throw new Error('That data release is not available. Load current data to search.');
     const version=requested??(await (await fetch('/data/current.json')).json()).release;
     const response=await fetch(`/data/releases/${version}.json`);
@@ -58,10 +59,10 @@ async function loadData(current=false) {
     for(const key of ['allocation','counts','geography','overlap','population']) $(`method-${key}`).textContent=release.methodology[key];
     $('data-release').textContent=release.id;
     $('source-list').innerHTML=release.sources.map(s=>`<li><a href="${escape(s.url)}" target="_blank" rel="noopener">${escape(s.title)}</a></li>`).join('');
-    if(current) history.replaceState(null,'',location.pathname);
+    if(current) history.replaceState(null,'','/');
     const area=resolveAreaUrl(location.href,release);
     if(area) {await selectArea(area,false);}
-    else if(parameters.get('area')&&!current) status('search-status','That area is not available in this release. Search for its name or postcode.',true);
+    else if(parameters.areaId&&!current) status('search-status','That area is not available in this release. Search for its name or postcode.',true);
   } catch(error) {status('search-status',error.message||'Area data could not be loaded. Try again.',true);$('retry').hidden=false;$('rankings-loading').textContent='Spending rankings are unavailable until the area data loads. Use “Load current data” above to retry.';}
 }
 function closeSuggestions() {
@@ -116,6 +117,7 @@ async function chooseSuggestion(index) {
 async function selectArea(area,moveFocus=true,fromRanking=false) {
   clearDownload();
   selected=area;summary=buildSummary(area,release);
+  document.title=`${area.name} | Welfare Data Australia`;
   closeSuggestions();
   $('area-search').value=area.name;
   $('area-summary').hidden=false;

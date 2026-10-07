@@ -6,3 +6,5 @@ outputs/
 *.tar.gz
 .DS_Store
 .openai/
+dist/area/
+dist/social/

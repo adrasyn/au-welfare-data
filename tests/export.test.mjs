@@ -26,7 +26,7 @@ test('non-additive rent assistance and estimate notes survive the export',()=>{
   assert.match(documentContent(summary,'invoice')?.footer?.join(' ')??'',/not added/i);
 });
 test('QR area links pin both stable identity and data release',()=>{
-  assert.equal(areaLink(summary,'https://example.com'), 'https://example.com/?area=ced%3A101&release=2024-25-v1');
+  assert.equal(areaLink(summary,'https://example.com'), 'https://example.com/area/ced/101/2024-25-v1/all/');
 });
 test('download names include area geography, name, style and release',()=>{
   assert.equal(exportFilename(summary,'invoice','pdf'),'welfare-ced-banks-invoice-2024-25-v1.pdf');

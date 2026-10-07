@@ -1,12 +1,6 @@
 import { formatAUD, formatMoneyObservation, formatCount, formatSourceDate, formatRecipientRate } from './model.mjs';
 
-export function areaLink(summary,origin) {
-  const url=new URL('/',origin);
-  url.searchParams.set('area',summary.area.id);
-  url.searchParams.set('release',summary.releaseId);
-  if(summary.scope?.id&&summary.scope.id!=='all')url.searchParams.set('scope',summary.scope.id);
-  return url.href;
-}
+export {areaLink} from './urls.mjs';
 export function exportFilename(summary,style,format) {
   const name=summary.area.name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   return `welfare-${summary.area.type}-${name}-${summary.scope?.id&&summary.scope.id!=='all'?summary.scope.id+'-':''}${style}-${summary.releaseId}.${format}`;

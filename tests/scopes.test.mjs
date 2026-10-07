@@ -5,6 +5,7 @@ import {buildSummary,allocationIssues} from '../dist/lib/model.mjs';
 import {buildRankings} from '../dist/lib/rankings.mjs';
 import {areaLink,documentContent,exportFilename} from '../dist/lib/render.mjs';
 import {validateRelease} from '../scripts/data-utils.mjs';
+import {readAreaLink} from '../dist/lib/urls.mjs';
 
 const group=(id,value=100)=>({id,label:id,financialYear:'2024-25',allocationCountDate:'2025-06-30',additive:id!=='cra',spending:{value,unit:'AUD',period:'2024-25',geographyVintage:'LGA2024'},counts:[{value:10,label:'People',unit:'people',period:'2025-06-30',geographyVintage:'LGA2024'}]});
 const area=(name,groups)=>({id:`lga:${name}`,name,type:'lga',state:'NSW',geographyVintage:'LGA2024',population:{value:1000,period:'2024-06-30',geographyVintage:'LGA2024'},groups});
@@ -35,10 +36,10 @@ test('ranks use selected programmes and completeness rather than the all-program
 test('scope persists in share links, document labels and download names',()=>{
   const scoped=filterRelease(release,'retirement');
   const summary=buildSummary(scoped.areas[0],scoped);
-  assert.equal(new URL(areaLink(summary,'https://example.com')).searchParams.get('scope'),'retirement');
+  assert.equal(readAreaLink(areaLink(summary,'https://example.com')).scope,'retirement');
   assert.match(documentContent(summary,'invoice').scopeLabel,/Retirement/);
   assert.match(exportFilename(summary,'receipt','png'),/retirement/);
-  assert.equal(new URL(areaLink({...summary,scope:scopeFor('all')},'https://example.com')).searchParams.has('scope'),false);
+  assert.equal(readAreaLink(areaLink({...summary,scope:scopeFor('all')},'https://example.com')).scope,'all');
 });
 test('annual aged-care clients retain their period instead of becoming June snapshot counts',()=>{
   const annual={...group('aged-care-support',100),countCoverage:'annual',allocationCountDate:'2024-25',counts:[{...group('aged-care-support').counts[0],period:'2024-25',label:'Annual clients'}]};

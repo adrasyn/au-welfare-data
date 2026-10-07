@@ -1,3 +1,4 @@
+import {readAreaLink} from './urls.mjs';
 const normalise=text=>String(text).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 
 export function searchAreas(query,areas) {
@@ -20,7 +21,7 @@ export function searchSuggestions(query,areas,postcodes) {
 }
 
 export function resolveAreaUrl(url,release) {
-  const params=new URL(url).searchParams;
-  if(params.get('release') && params.get('release')!==release.id) return null;
-  return release.areas.find(a=>a.id===params.get('area'))??null;
+  const selection=readAreaLink(url);
+  if(selection.releaseId && selection.releaseId!==release.id) return null;
+  return release.areas.find(a=>a.id===selection.areaId)??null;
 }
