@@ -4,12 +4,12 @@ The initial website contains nine payment groups, recipient units and estimated 
 
 ## Checks completed
 
-- 35 automated tests pass, including official source spot checks for Sydney electorate and Armidale council, suppressed counts, correspondence ratios, CRA subtotal exclusion, FTB component reconciliation, allocation metadata compatibility and pinned release links.
+- 36 automated tests pass, including official source spot checks for Sydney electorate and Armidale council, suppressed counts, correspondence ratios, CRA subtotal exclusion, FTB component reconciliation, allocation metadata compatibility, pinned release links and the verified production origin.
 - Clean installation and build pass without an existing cache directory.
 - Sydney and Armidale render nine groups without horizontal overflow at 320, 375 and 430 pixels; desktop rendering was visually inspected at 1280 pixels. Postcode 0800 preserves its leading zero and returns multiple choices.
 - Missing-population fixture: area selection renders counts and money, defaults to invoice, explains the missing denominator and disables receipt downloads. The fixture was removed.
 - Receipt text shows per-resident amounts; invoice text shows annual area amounts. Both preserve source counts and units. Full text is exposed through a named disclosure associated with the preview image.
-- Actual browser-generated receipt/invoice PNG and PDF files for Sydney and Armidale were inspected. PDFs contain one page at the intended paper size. All four PNG QR codes decode to the correct canonical area URL and frozen release. Final preview pixels match the inspected PNG files after the review fixes.
+- Actual browser-generated receipt/invoice PNG and PDF files for Sydney and Armidale were inspected. PDFs contain one page at the intended paper size. The four preview graphics were pixel-identical after the review fixes. Hosting then assigned the final origin `https://benefits-data-australia.vvlsn.chatgpt.site`; share and QR links were updated to that verified URL, and the final four preview QR codes were decoded again against it.
 
 Native in-app-browser saved-download events did not expose the generated file. A temporary local capture verified all eight generated files and was removed before publication. Generation and save-link behavior are verified; native save-dialog delivery still requires a user's ordinary browser. Physical-phone keyboard behavior and execution in a screen reader have not been tested. An independent reviewer checked data contracts, arithmetic and display/export agreement, but did not re-audit every national expenditure cell; the original source audit and two research reviews provide that evidence.
 

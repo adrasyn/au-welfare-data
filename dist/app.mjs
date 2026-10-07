@@ -3,7 +3,7 @@ import { searchAreas, resolveAreaUrl } from './lib/search.mjs';
 import { documentContent, areaLink, exportFilename } from './lib/render.mjs';
 import { previewGraphic, exportGraphic, saveBlob } from './lib/download.mjs';
 
-const canonicalOrigin='https://benefits-data-australia.adored-clock-8073.chatgpt.site';
+const canonicalOrigin='https://benefits-data-australia.vvlsn.chatgpt.site';
 const $=id=>document.getElementById(id);
 const escape=text=>String(text??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let release,selected,summary,style='receipt',matches=[],filter='all',previewVersion=0,exporting=false,downloadUrl;

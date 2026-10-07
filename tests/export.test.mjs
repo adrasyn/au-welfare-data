@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
 import { buildSummary } from '../dist/lib/model.mjs';
 import { documentContent, exportFilename, areaLink } from '../dist/lib/render.mjs';
 const summary=buildSummary({id:'ced:101',name:'Banks',state:'NSW',type:'ced',geographyVintage:'CED2024',population:{value:1000,period:'2024-06-30',geographyVintage:'CED2024'},groups:[
@@ -35,4 +36,8 @@ test('export dates follow their actual source metadata rather than fixed labels'
   const content=documentContent(dated,'receipt');
   assert.match(content.countDate,/March 2024/);
   assert.match(content.populationDate,/June 2023/);
+});
+test('share and QR links use the verified production origin',async()=>{
+  const app=await readFile(new URL('../dist/app.mjs',import.meta.url),'utf8');
+  assert.equal(app.match(/const canonicalOrigin='([^']+)'/)?.[1],'https://benefits-data-australia.vvlsn.chatgpt.site');
 });
