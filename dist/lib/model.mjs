@@ -111,6 +111,6 @@ export function buildSummary(area,release={}) {
   return {area,groups,scope:scopeFor(release.scope?.id),total:{value,status:value===null?'unavailable':'estimated',unit:'AUD'},
     totalPerResident:{value:perResidentAvailable && value!==null?value/population.value:null,status:'estimated',unit:'AUD'},
     totalLabel:incomplete?'Incomplete programme subtotal':overlap?'Programme subtotal':'Selected programme total',
-    perResidentAvailable,incomplete,notes,issues,recipientMeasures,releaseId:release.id??'2024-25-v1',financialYear:release.financialYear??[...periods][0],
+    perResidentAvailable,incomplete,modelledCareWithIncompleteCounts:groups.some(g=>g.spending.basis==='published-mapped-client-share'&&g.allocation?.countCoverageIncomplete),notes,issues,recipientMeasures,releaseId:release.id??'2024-25-v1',financialYear:release.financialYear??[...periods][0],
     countDate:release.countDate??'2025-06-30',populationDate:population?.period??release.populationDate};
 }

@@ -92,3 +92,37 @@ The [NDIA 2024–25 actuarial report, printed page 220](https://www.ndis.gov.au/
 `scripts/include-residential-care.mjs` clones v2 into v3, preserving every count, expenditure estimate and population. It marks residential care `overlapPolicy: include-gross`, making it additive in All even with NDIS present. Rent Assistance remains non-additive. The methodology, standalone exports and social descriptions disclose that no reimbursement overlap is deducted. No invented national or local deduction is applied.
 
 All ranks now require residential-care coverage: **133 CED / 472 LGA**. Working-age (**150 / 508**) and retirement (**133 / 493**) coverage stays the same. Areas with incomplete care data retain known subtotals without receiving a complete-total or per-person rank. Armidale All increases from $261,765,917.8114 to $288,700,265.7177, or $9,738 per resident rounded, while its old v2 share retains $8,830.
+
+## Proposed ranking correction, investigated 7 October 2026
+
+This section records the researched proposal that preceded the local v4 implementation documented below. At investigation time, v3 and the live site were unchanged.
+
+The current extraction conflates an absent region in a positive-record table with an explicitly unavailable observation. Each of the three inspected regional tables has only positive numeric totals: residential has 323 SA3 rows, home care 335 and CHSP 336. No total cell is zero, suppressed or otherwise non-numeric. The Notes do not explicitly say that every absent region has zero recipients; they exclude unmappable addresses. Therefore absence alone is not sufficient evidence of a real-world zero, especially for recipient-location programmes.
+
+An independent residential check used the [30 June 2025 Australia service register](https://www.gen-agedcaredata.gov.au/getmedia/2599a590-3c5f-4227-aac3-f0a3a8aa84e4/Service-List-2025-Australia_300126), downloaded from the [official service-list publication](https://www.gen-agedcaredata.gov.au/resources/access-data/2025/october/aged-care-service-list-30-june-2025). Its 2,590 rows with Care Type `Residential` occupy exactly the same 323 SA3 2016 regions as the positive residential recipient table. Every omitted spatial SA3 has no registered mainstream residential facility. Some have Multi-Purpose or Indigenous flexible-care services; those are different programmes and must not be interpreted as missing mainstream residential counts. This supports a programme-specific, date-specific structural-zero inference for the residential snapshot. It does not validate zeros for home-care or CHSP residents, and says nothing about facility funding earlier in the financial year.
+
+The existing expenditure model allocates matched national programme budgets in proportion to published geographically mapped client counts. Its denominator already excludes unlocated clients and its notes already disclose the assumption that their spending distribution resembles mapped clients. Across all 150 CEDs, the sum of numeric allocations, including existing known subtotals, is:
+
+| Programme | Matched national budget | Existing numeric allocation | Allocated share |
+| --- | ---: | ---: | ---: |
+| Residential care | $23,965,600,000 | $23,965,593,757.41 | 99.999974% |
+| Home-care packages | $8,659,900,000 | $8,659,898,515.67 | 99.999983% |
+| Home support | $3,270,000,000 | $3,269,999,216.06 | 99.999976% |
+
+The residuals come from outside-registry transfers and official correspondence precision. This checks allocation arithmetic, not completeness of observed client coverage. Crucially, the current 17 exclusions do not represent 17 unallocated aged-care budgets; the published-data spending model already produces an allocation for them.
+
+Recommended correction: distinguish completeness of observed recipient counts from availability of a modelled programme-budget allocation. Use the existing published-mapped-client allocation as the explicit spending estimate, including when the observed count retains an incomplete label. Do not manufacture additional recipients or treat an absent source row as an observed zero. Keep recipient-rate ranks withheld where counts remain incomplete. Only allow this expenditure estimate after checking the entire published source table is numeric, its totals reconcile across independently tabulated regional structures, all budget/period/geography controls match, and the destination has a valid allocation. Explicit suppression, incompatible metadata, and unavailable primary payment amounts must continue to withhold affected ranks.
+
+An in-memory experiment applying this narrowly to aged-care spending with an existing finite known subtotal restores spending and per-person ranks for all 150 CEDs. Existing numerical area spending and per-person values do not change. All-welfare LGA spending coverage becomes 491/547, with other missing/suppressed programmes still excluding areas. Residential recipient-rate coverage remains 133/150 CEDs until the separately evidenced structural-zero policy is implemented. This experiment is not a production change.
+
+Suggested public methodology: “Aged-care spending is estimated by allocating national programme expenditure using published, geographically mapped client shares and ABS correspondence tables. Areas can receive a spending estimate even when recipient-count coverage is incomplete. Unlocated clients are assumed to have the same spending distribution as mapped clients. Rankings compare these allocation estimates, rather than audited local expenditure.”
+
+If implemented, publish a new frozen release rather than changing v1–v3 shared links, preserve count-coverage notes in area details and exports, and keep the independent national-budget reconciliation in the reproducible release audit. Exact rank positions describe point estimates; they should not imply statistical certainty about the true order of close areas.
+
+## V4 implementation
+
+The user approved the proposal. `scripts/audit-aged-care-ranking.py` checks all six regional programme total columns and writes the checked-in source control artifact with SHA256 hashes. `scripts/allocate-mapped-aged-care.mjs` builds `2024-25-v4` from frozen v3 after validating source hashes against the manifest, numeric-only published controls, programme budgets/denominators, partial allocation arithmetic and national expenditure reconciliation for CED and LGA separately.
+
+Every recipient-count object is unchanged. All dollar totals are unchanged: finite existing aged-care `knownSubtotal` allocations become explicit modelled point estimates, with their basis and incomplete count coverage recorded separately. No missing/suppressed primary-payment value is promoted. No absent recipient row is turned into zero. Incomplete recipient rates remain unranked, and no residential structural-zero inference is implemented.
+
+V4 spending/per-person rank coverage is All **150 CED / 491 LGA**, Working-age **150 / 508**, Retirement **150 / 512**. Current v1–v3 files remain unchanged, preserving frozen shared-link data. Affected document footers and social descriptions disclose incomplete counts and modelled spending. Site methodology and ranking notes explain that ranks compare point estimates and national reconciliation does not establish complete real-world client coverage.

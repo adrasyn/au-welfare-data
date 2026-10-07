@@ -27,6 +27,7 @@ export function documentContent(summary,style) {
     receiptNotes:[
       'Estimated local spending; AUD per resident (all ages).',
       '* Rent assistance excluded from total',
+      ...(summary.modelledCareWithIncompleteCounts?['Aged-care counts incomplete; spending modelled.']:[]),
       ...(summary.groups.some(group=>group.overlapWith)?[summary.groups.some(group=>group.overlapWith&&group.additive===false)?'Residential care is not added: can overlap NDIS.':summary.scope?.id==='retirement'?'NDIS is outside this programme selection.':'Aged care / NDIS overlap is not deducted.']:[]),
       ...(summary.scope?.id&&summary.scope.id!=='all'?['Programme groups, not recipient age bands.']:[]),
       ...(summary.issues??[])
@@ -34,6 +35,7 @@ export function documentContent(summary,style) {
     footer:[
       summary.scope?.description??'Programme groups describe support, not recipient age bands.',
       'Local spending is estimated from national expenditure and recipient shares.',
+      ...(summary.modelledCareWithIncompleteCounts?['Aged-care recipient counts remain incomplete. Spending is a modelled allocation using published geographically mapped client shares. Spending ranks compare these allocation estimates; incomplete recipient rates are not ranked.']:[]),
       'Rent Assistance helps eligible renters receiving a qualifying payment. It is not added to the subtotal because government expenditure already includes it within primary payments; adding it again would double count spending.',
       'The Rent Assistance estimate also covers programmes outside this selection; it is not an exact breakdown of the rows above.',
       'Counts can overlap. FTB counts cover instalment families; NDIS council conversions are estimated where boundaries change.',

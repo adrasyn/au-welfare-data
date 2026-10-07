@@ -1,0 +1,64 @@
+{
+  "verifiedAt": "2026-10-07",
+  "financialYear": "2024-25",
+  "basis": "Published geographically mapped GEN client records; unmappable addresses excluded. Absent rows are not asserted to be real-world zero recipients.",
+  "programmes": {
+    "aged-care-residential": {
+      "sourceFile": "gen-residential-2025.xlsx",
+      "sha256": "7f4c7ced55560129dc8aab20f5ba4fbdd021e28af5fd7d99403c4134ff97e9d5",
+      "tables": [
+        {
+          "sheet": "Table 4.1 (LGA)",
+          "rows": 387,
+          "numericTotal": 203624,
+          "nonNumericTotalCells": 0
+        },
+        {
+          "sheet": "Table 4.2 (SA3)",
+          "rows": 323,
+          "numericTotal": 203624,
+          "nonNumericTotalCells": 0
+        }
+      ],
+      "nationalMappedCount": 203624
+    },
+    "aged-care-home": {
+      "sourceFile": "gen-home-care-2025.xlsx",
+      "sha256": "0ec675accb7c8efc6a00666d34af8c3c7cfb50b27fec84df9e6c78e06941396b",
+      "tables": [
+        {
+          "sheet": "Table 2.1 (LGA)",
+          "rows": 522,
+          "numericTotal": 291435,
+          "nonNumericTotalCells": 0
+        },
+        {
+          "sheet": "Table 2.2 (SA3)",
+          "rows": 335,
+          "numericTotal": 291435,
+          "nonNumericTotalCells": 0
+        }
+      ],
+      "nationalMappedCount": 291435
+    },
+    "aged-care-support": {
+      "sourceFile": "gen-home-support-2025.xlsx",
+      "sha256": "c9ef322d7dbc8bfdf3343b6ffea4ba639e691d9f1833d8a5e8dd8d3c772a9c8a",
+      "tables": [
+        {
+          "sheet": "Table 1.1 (LGA)",
+          "rows": 536,
+          "numericTotal": 834278,
+          "nonNumericTotalCells": 0
+        },
+        {
+          "sheet": "Table 1.2 (SA3)",
+          "rows": 336,
+          "numericTotal": 834278,
+          "nonNumericTotalCells": 0
+        }
+      ],
+      "nationalMappedCount": 834278
+    }
+  }
+}

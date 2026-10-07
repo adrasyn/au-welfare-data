@@ -12,7 +12,7 @@ export function socialPreview(summary,origin) {
   const geography=`${summary.area.type==='ced'?'Federal division':'Council area'} · ${summary.area.state}`;
   const excluded=summary.groups.some(group=>group.id==='aged-care-residential'&&group.additive===false);
   const grossOverlap=summary.groups.some(group=>group.overlapPolicy==='include-gross')&&summary.groups.some(group=>group.id==='ndis');
-  const description=`${amount} — ${metric.toLowerCase()}. ${scope}, ${period}. Uses all residents, including children.${excluded?' Residential aged care excluded to avoid overlap with NDIS.':grossOverlap?' Residential aged care and NDIS included; reimbursement overlap is not deducted.':''}`;
+  const description=`${amount} — ${metric.toLowerCase()}. ${scope}, ${period}. Uses all residents, including children.${excluded?' Residential aged care excluded to avoid overlap with NDIS.':grossOverlap?' Residential aged care and NDIS included; reimbursement overlap is not deducted.':''}${summary.modelledCareWithIncompleteCounts?' Aged-care counts remain incomplete; spending is modelled using published mapped client shares.':''}`;
   const url=areaLink(summary,origin);
   const title=`${summary.area.name} — ${amount}${!available?'':summary.incomplete?' known spend per person (incomplete)':' per person'} | Welfare Data Australia`;
   return {url,image:new URL('preview.png',url).href,title,description,area:summary.area.name,amount,metric,scope,period,geography,alt:`${summary.area.name}, ${geography}. ${description}`};
