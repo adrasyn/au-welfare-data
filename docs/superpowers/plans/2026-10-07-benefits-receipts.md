@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build an Australian area search and receipt/invoice generator showing recipient counts and spending for the seven approved benefit groups, with PNG and PDF downloads.
+**Goal:** Build an Australian area search and receipt/invoice generator showing recipient counts and spending for the nine approved benefit groups, with PNG and PDF downloads.
 
 **Architecture:** A static HTML/CSS/JavaScript application consumes a validated, versioned JSON data snapshot. Pure calculation functions produce a shared export model used by the accessible page, preview and browser downloads. Offline acquisition scripts record the source evidence; visitors do not depend on live government APIs.
 
@@ -12,8 +12,8 @@
 
 ## Global Constraints
 
-- “Total” always means **these seven selected benefit groups**, not all Australian welfare spending.
-- DSP and Age Pension are included alongside the original five groups. Other proposed additions require the user's scope decision.
+- “Total” always means **these nine selected benefit groups**, not all Australian welfare spending.
+- DSP and Age Pension are included alongside the original five groups. Parenting Payment and Carer Payment are approved; Child Care Subsidy, Parental Leave Pay and Carer Allowance remain excluded.
 - Mobile is explicitly search-first: show the postcode/electorate/council search, labelled area choices, summary and downloads, with no map.
 - Plan budgets are not spending.
 - Counts are a primary part of the page and both export styles, not hidden only in a detail panel.
@@ -162,7 +162,7 @@ test('a postcode returns every intersecting area', () => {
 
 **Interfaces:** Consume the release, search results and `buildSummary`. Renderer uses `draw.text`, `draw.line`, `draw.rect`, `draw.image` and measured text width to create both styles without recalculating money or counts.
 
-- [ ] Read applicable design skills, choose the accent palette, and implement the focused light interface: labelled postcode/electorate/council search, explicit area choices, date/source information, seven-group summary and receipt/invoice switch. Use a single-column search-first flow on mobile without a map. Stack the summary and document preview; keep page content within viewport width and use touch-friendly controls.
+- [ ] Read applicable design skills, choose the accent palette, and implement the focused light interface: labelled postcode/electorate/council search, explicit area choices, date/source information, nine-group summary and receipt/invoice switch. Use a single-column search-first flow on mobile without a map. Stack the summary and document preview; keep page content within viewport width and use touch-friendly controls.
 - [ ] Put count components directly beneath each receipt benefit line and in a dedicated invoice count column. Preserve FTB A/B and Youth Allowance categories, source units, count dates and suppression. Include counts in the accessible DOM and Canvas previews.
 - [ ] Implement the drawing adapters using this shared model contract:
 
@@ -179,7 +179,7 @@ export function renderGraphic(summary, style, draw, qr) {
 ```
 
 - [ ] Add loading, no-match, multiple-choice, missing-population, suppressed-count and unavailable-spending states. Use semantic buttons and live status text; restore focus sensibly when area selection changes. Keep financial-year and count-date labels separate.
-- [ ] Start the preview under the Sites local-preview instructions. Check mobile at 320, 375 and 430 CSS-pixel widths and desktop in the supported browser: postcode and area-name search, keyboard navigation, state/type labels, long area names, document wrapping and all seven count groups. Check small-screen input focus/software keyboard and both downloads, not only a screenshot. Confirm `document.documentElement.scrollWidth <= window.innerWidth` using the read-only browser DOM check. Commit the page and previews after observed failures are fixed.
+- [ ] Start the preview under the Sites local-preview instructions. Check mobile at 320, 375 and 430 CSS-pixel widths and desktop in the supported browser: postcode and area-name search, keyboard navigation, state/type labels, long area names, document wrapping and all nine count groups. Check small-screen input focus/software keyboard and both downloads, not only a screenshot. Confirm `document.documentElement.scrollWidth <= window.innerWidth` using the read-only browser DOM check. Commit the page and previews after observed failures are fixed.
 
 ### Task 5: PNG/PDF downloads and QR links
 
@@ -211,7 +211,7 @@ export function saveBlob(blob, filename) {
 
 **Interfaces:** Produce a verified owner-private deployment URL and a source-backed saved version using the native Sites workflow.
 
-- [ ] Run `npm test` and data validation against the production snapshot. Reconcile representative source records and all five review-focus cases. Perform mobile/desktop browser checks for search, all seven categories and their counts, both styles and four download combinations. Include an electorate and an LGA at each of the three specified mobile widths.
+- [ ] Run `npm test` and data validation against the production snapshot. Reconcile representative source records and all five review-focus cases. Perform mobile/desktop browser checks for search, all nine categories and their counts, both styles and four download combinations. Include an electorate and an LGA at each of the three specified mobile widths.
 - [ ] Register the Site once only, persist its returned identity, and set the static directory to `dist`. Use the native Sites source helper to commit/push and package the exact validated source state. Credentials go through stdin only, never files or command arguments.
 - [ ] Deploy via the owner-private native operation, preserving access. If deployment is non-terminal, poll status to completion. Use the deployed canonical URL for QR links, rebuild exports if necessary, and verify that links remain pinned to the release.
 - [ ] Document source-refresh commands, estimation assumptions and verified coverage in README. Provide the deployed URL and disclose any specific unavailable values or verification limits. Do not claim the site reports actual local spending where it estimates distribution.

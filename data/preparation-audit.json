@@ -1,0 +1,74 @@
+{
+  "areas": 697,
+  "ced": 150,
+  "lga": 547,
+  "postcodes": 2641,
+  "missingDss": [],
+  "missingNdis": [
+    "lga:44000",
+    "lga:56160",
+    "lga:57630",
+    "lga:58470"
+  ],
+  "suppressedNdis": 35,
+  "unmatchedNdisSource": [
+    {
+      "name": "ACT - Other",
+      "count": "<11"
+    },
+    {
+      "name": "MIS - Other",
+      "count": "333"
+    },
+    {
+      "name": "NSW - Other",
+      "count": "24"
+    },
+    {
+      "name": "NT - Other",
+      "count": "67"
+    },
+    {
+      "name": "QLD - Other",
+      "count": "<11"
+    },
+    {
+      "name": "SA - Other",
+      "count": "<11"
+    },
+    {
+      "name": "VIC - Other",
+      "count": "<11"
+    },
+    {
+      "name": "WA - Other",
+      "count": "90"
+    }
+  ],
+  "nationalDenominators": {
+    "State": "Total",
+    "ABSTUDY (Living allowance)": 8030,
+    "ABSTUDY (Non-living allowance)": 19425,
+    "Age Pension": 2667380,
+    "Austudy": 25050,
+    "Carer Allowance": 678965,
+    "Carer Allowance (Child Health Care Card only)": 7410,
+    "Carer Payment": 325845,
+    "Commonwealth Rent Assistance": 1377655,
+    "Commonwealth Seniors Health Card": 544780,
+    "Disability Support Pension": 830855,
+    "Double Orphan Pension": 570,
+    "Family Tax Benefit A": 1287270,
+    "Family Tax Benefit B": 1010245,
+    "Health Care Card": 1364565,
+    "JobSeeker Payment": 883700,
+    "Low Income Card": 182950,
+    "Parenting Payment Partnered": 59130,
+    "Parenting Payment Single": 331770,
+    "Pension Concession Card": 4539150,
+    "Special Benefit": 5670,
+    "Youth Allowance (other)": 101460,
+    "Youth Allowance (student and apprentice)": 158870,
+    "null": null
+  }
+}

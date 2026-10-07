@@ -7,7 +7,7 @@ Status: approved on 7 October 2026; recipient counts, mobile search, DSP and Age
 
 Help the general public explore welfare spending in their Australian federal electorate or local government area and download a clear, shareable summary. The primary launch feature is a receipt/invoice generator inspired by benefitsdata.uk/mybill. Interactive maps and the other UK homepage features are later work.
 
-The user approved the journey: search postcode or area, choose electorate or council area, preview, download. They requested these seven benefit groups:
+The user approved the journey: search postcode or area, choose electorate or council area, preview, download. They requested these nine benefit groups:
 
 | Group | Included components |
 | --- | --- |
@@ -18,12 +18,14 @@ The user approved the journey: search postcode or area, choose electorate or cou
 | Commonwealth Rent Assistance | The rent assistance component, separated from the underlying payment. |
 | Disability Support Pension (DSP) | Recipient counts and spending for DSP, separate from NDIS. |
 | Age Pension | Recipient counts and spending; use the official name “Age Pension”. |
+| Parenting Payment | Single and Partnered, with separate component counts. |
+| Carer Payment | Income support for carers; Carer Allowance and Carer Supplement excluded. |
 
-“Total” always means **these seven selected benefit groups**, not all Australian welfare spending. Carer Payment and Parenting Payment remain outside the confirmed initial scope pending the user's category decision.
+“Total” always means **these nine selected benefit groups**, not all Australian welfare spending. Parenting Payment and Carer Payment were approved in the next scope decision. Child Care Subsidy, Parental Leave Pay and Carer Allowance remain excluded.
 
 ### Other major categories identified for the user's decision
 
-Services Australia's 2024–25 annual report (printed pages 56–58) reports Parenting Payment ($8.1 billion), Carer Payment ($8.1 billion), Carer Allowance ($3.0 billion), Child Care Subsidy ($15.2 billion) and Parental Leave Pay ($3.2 billion). Recommend including these for broader coverage of major household payments. They are proposed additions, not yet approved categories. The scope is selected household benefits plus NDIS; a complete welfare-services account would require a separate decision about aged-care services and other programmes, including veterans' support. Austudy and ABSTUDY are further student-payment categories to consider, separate from Youth Allowance.
+Services Australia's 2024–25 annual report (printed pages 56–58) reports Parenting Payment ($8.1 billion), Carer Payment ($8.1 billion), Carer Allowance ($3.0 billion), Child Care Subsidy ($15.2 billion) and Parental Leave Pay ($3.2 billion). Recommend including these for broader coverage of major household payments. The user approved Parenting Payment and Carer Payment and declined the remaining proposed additions. The scope is selected household benefits plus NDIS; a complete welfare-services account would require a separate decision about aged-care services and other programmes, including veterans' support. Austudy and ABSTUDY are further student-payment categories to consider, separate from Youth Allowance.
 
 Source: https://www.servicesaustralia.gov.au/sites/default/files/2025-10/annual-report-2024-25.pdf
 
@@ -35,8 +37,8 @@ Mobile is explicitly search-first: show the postcode/electorate/council search, 
 
 Offer two export styles:
 
-- **Receipt:** a compact till-receipt layout showing estimated annual spending per resident for each of the seven groups, the corresponding local recipient/participant counts, and a selected-benefits spending total.
-- **Invoice:** a clean document layout showing local recipient/participant counts and estimated annual total spending for the same seven groups and the same area.
+- **Receipt:** a compact till-receipt layout showing estimated annual spending per resident for each of the nine groups, the corresponding local recipient/participant counts, and a selected-benefits spending total.
+- **Invoice:** a clean document layout showing local recipient/participant counts and estimated annual total spending for the same nine groups and the same area.
 
 Each export includes the area name/type, AUD units, reporting period, estimate labels, source/method note and a QR code linking to the matching area summary. Downloads are PNG and PDF; printing is also supported. The page shows recipient/participant context and the detailed components without attempting to sum them into a unique-person total. Export labels describe an area spending summary; they do not suggest an individual resident owes money.
 
@@ -66,7 +68,7 @@ First implementation task: audit the source definitions, geography coverage and 
 
 Prefer a reported local payment amount where the source publishes one for the correct area and period. Otherwise estimate local spending from a separately reported, compatible program expenditure total and the area's share of the matching recipient population. Document the weighting period and population definition. Use service-district weighting for NDIS only if source definitions and geography concordances support it; otherwise use a labelled national-average allocation. Such allocations are estimates of distribution, not measured local expenditure or benefit entitlements.
 
-Choose the newest financial year with complete, compatible spending inputs for all seven groups. Display any more recent recipient snapshot with its own date. Do not mix financial years inside a total. Youth Allowance and FTB component expenditures must be distinct. Verify whether base-program expenditure includes Rent Assistance before adding its line; remove overlap using documented inputs, or leave the combined total unavailable.
+Choose the newest financial year with complete, compatible spending inputs for all nine groups. Display any more recent recipient snapshot with its own date. Do not mix financial years inside a total. Youth Allowance and FTB component expenditures must be distinct. Verify whether base-program expenditure includes Rent Assistance before adding its line; remove overlap using documented inputs, or leave the combined total unavailable.
 
 Use a published ABS population denominator compatible with the selected area boundaries and record its reference date. When exact matching population is unavailable, show the area total but disable the per-resident receipt with an explanation. Never use electorate enrolments as resident population.
 
@@ -95,7 +97,7 @@ Handle invalid postcodes, ambiguous searches, unknown areas, unincorporated area
 Acceptance checks:
 
 - Name/postcode lookup distinguishes area types and states; ambiguous postcodes return choices.
-- All seven requested groups appear with the correct components, including DSP, Age Pension and NDIS as separate groups.
+- All nine requested groups appear with the correct components, including DSP, Age Pension and NDIS as separate groups.
 - Each benefit group shows counts alongside spending on the page, receipt, invoice, PNG and PDF, with correct source units and snapshot dates. Overlapping components and benefit groups never produce an invented unique-person total.
 - Known source examples reconcile to imported counts and spending inputs; aggregate/subtotal rows are not counted twice.
 - Suppressed values, mismatched boundaries, missing inputs and Rent Assistance overlap cannot silently produce a complete total.
@@ -106,3 +108,7 @@ Acceptance checks:
 - At 320, 375 and 430 CSS-pixel widths, postcode/electorate/council search works without a map, counts and spending remain legible, and both export styles download without horizontal page scrolling.
 
 The launch is complete when a visitor can find their area and download both formats with all requested benefit groups supported by verified data or clearly explained source limitations. A visual prototype with fabricated figures does not satisfy this design.
+
+## Geography allocation requirement
+
+The user requires the official ABS correspondence tables when allocation across ASGS, CED or LGA geographies is necessary. Preserve source/target edition, published weights and the estimated status of converted counts.

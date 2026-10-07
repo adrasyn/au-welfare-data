@@ -1,0 +1,117 @@
+{
+  "acquiredAt": "2026-10-07T01:19:42.547Z",
+  "entries": [
+    {
+      "id": "dss-lga-metadata",
+      "url": "https://data.gov.au/data/api/3/action/package_show?id=dss-payments-by-local-government-area",
+      "filename": "dss-lga-metadata.json",
+      "sha256": "626ee780aa155123233c6b0feb0699d12015912244dece653b189db5faefe301",
+      "bytes": 14877
+    },
+    {
+      "id": "dss-lga",
+      "url": "https://data.gov.au/data/dataset/3c45b53c-c6c3-4fcb-9023-f05d95ab42a9/resource/b3d92d5c-2e59-4986-9519-ba16d1897291/download/dss-benefit-and-payment-recipient-demographics-2024-lga-june-2026.csv",
+      "filename": "dss-lga.csv",
+      "sha256": "834438fd86236bb5b5045447bcca2091f8463301fa83488098d2157dbebee6a2",
+      "bytes": 429490
+    },
+    {
+      "id": "dss-ced-metadata",
+      "url": "https://data.gov.au/data/api/3/action/package_show?id=dss-payments-by-commonwealth-electoral-division",
+      "filename": "dss-ced-metadata.json",
+      "sha256": "25c5e912193900bbbdcdf4c1965abf95cf601a1d6c0365b07dd494bfa8bba4fa",
+      "bytes": 14841
+    },
+    {
+      "id": "dss-ced",
+      "url": "https://data.gov.au/data/dataset/1c3745c2-ccd7-4a9f-be73-c08328c9cbe6/resource/95a23542-4b39-4e75-918f-15e14a51ce0e/download/dss-benefit-and-payment-recipient-demographics-2024-ced-june-2026.csv",
+      "filename": "dss-ced.csv",
+      "sha256": "1c8673b7c849608d7206c1b6c3071e9c4560d479989335f5d0f510fbcdc90bff",
+      "bytes": 158779
+    },
+    {
+      "id": "dss-demographic-metadata",
+      "url": "https://data.gov.au/data/api/3/action/package_show?id=dss-payment-demographic-data",
+      "filename": "dss-demographic-metadata.json",
+      "sha256": "0df49fc828188f48f3b2298b28428800315f6fc776a8fc3311e4ee091d52c1fd",
+      "bytes": 85792
+    },
+    {
+      "id": "dss-demographic",
+      "url": "https://data.gov.au/data/dataset/cff2ae8a-55e4-47db-a66d-e177fe0ac6a0/resource/c3adb418-d2f9-48a8-bca6-66fa448628e5/download/dss-benefit-and-payment-recipient-demographics-june-2025-final.xlsx",
+      "filename": "dss-demographic.xlsx",
+      "sha256": "9505072f8b79ad483136750b00f32ec0123d21333193e449cc947c20406b060e",
+      "bytes": 2443408
+    },
+    {
+      "id": "ndis-lga",
+      "url": "https://dataresearch.ndis.gov.au/media/4237/download?attachment",
+      "filename": "ndis-lga.csv",
+      "sha256": "24001fdea0f33ebaf8fc59491773c3e8695093b35ecd5c9d397e9263d7969253",
+      "bytes": 483384
+    },
+    {
+      "id": "ndis-ced",
+      "url": "https://dataresearch.ndis.gov.au/media/4235/download?attachment",
+      "filename": "ndis-ced.csv",
+      "sha256": "0d49c8ef99217e1e8ebc8dcaf2520bee4423a4b86a5126050012bef2f6c9075c",
+      "bytes": 75137
+    },
+    {
+      "id": "POA_2021_AUST",
+      "url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/allocation-files/POA_2021_AUST.xlsx",
+      "filename": "POA_2021_AUST.xlsx",
+      "sha256": "e1b82115e4cb46691924f6aa996f928d3771596e1d015acc17efdd807bb12c2e",
+      "bytes": 18584662
+    },
+    {
+      "id": "CED_2024_AUST",
+      "url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/allocation-files/CED_2024_AUST.xlsx",
+      "filename": "CED_2024_AUST.xlsx",
+      "sha256": "1358d0f2b5200a3dc5257d43e785764c965f6625533cf62869a61917288766ba",
+      "bytes": 15846780
+    },
+    {
+      "id": "LGA_2024_AUST",
+      "url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/allocation-files/LGA_2024_AUST.xlsx",
+      "filename": "LGA_2024_AUST.xlsx",
+      "sha256": "bff53667057e2d8d7414d2e339e55ee815108f8b9eb0aa67d5d9aa0d4d19bb00",
+      "bytes": 18448018
+    },
+    {
+      "id": "abs-population",
+      "url": "https://www.abs.gov.au/statistics/people/population/regional-population/2023-24/32180DS0004_2001-24.xlsx",
+      "filename": "abs-population.xlsx",
+      "sha256": "457d65ac0bf15fe9da4c669fc54b84b976e2c42e5cd5f96f2e5bdb6717f04c8c",
+      "bytes": 271275
+    },
+    {
+      "id": "CG_LGA_2020_LGA_2021",
+      "url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/correspondences/CG_LGA_2020_LGA_2021.csv",
+      "filename": "CG_LGA_2020_LGA_2021.csv",
+      "sha256": "fb1ba47536e1ee6423d25f1af4ec97be3c8e5dbef83996e8298de17fec71f4d9",
+      "bytes": 31970
+    },
+    {
+      "id": "CG_LGA_2021_LGA_2022",
+      "url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/correspondences/CG_LGA_2021_LGA_2022.csv",
+      "filename": "CG_LGA_2021_LGA_2022.csv",
+      "sha256": "be6722c14903be34886e1c77477f34e1b45257fa0cb07a277643e860196251d2",
+      "bytes": 28985
+    },
+    {
+      "id": "CG_2022_LGA_2023_LGA",
+      "url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/correspondences/CG_2022_LGA_2023_LGA.csv",
+      "filename": "CG_2022_LGA_2023_LGA.csv",
+      "sha256": "ddaf727a330bcfa8e2bf3bc02b97711997b75617e01a4ffed79ae8b089949a7a",
+      "bytes": 28806
+    },
+    {
+      "id": "CG_LGA_2023_LGA_2024",
+      "url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/correspondences/CG_LGA_2023_LGA_2024.csv",
+      "filename": "CG_LGA_2023_LGA_2024.csv",
+      "sha256": "e115acc5a6e8702ec5cd331542a7c3c2b6cf369c218ee61e2be76d91ce498813",
+      "bytes": 28807
+    }
+  ]
+}
