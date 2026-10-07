@@ -54,6 +54,8 @@ function wrapName(name,size) {
 export function socialSvg(card) {
   const size=card.area.length>36?52:72;
   const lines=wrapName(card.area,size);
+  const amountY=lines.length>1?444:420;
+  const amountSize=card.amount==='Unavailable'?80:lines.length>1?156:192;
   const text=(value,x,y,fontSize,weight=400,fill='#252525')=>`<text x="${x}" y="${y}" font-size="${fontSize}" font-weight="${weight}" fill="${fill}">${escape(value)}</text>`;
   const teeth=Array.from({length:61},(_,i)=>`${1200-i*20},${i%2?618:630}`).join(' ');
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
@@ -63,9 +65,9 @@ export function socialSvg(card) {
   ${text('Welfare Data Australia',64,80,30,700)}
   ${text(card.geography,64,130,24,400,'#555555')}
   ${lines.map((line,i)=>text(line,64,228+i*(size*1.1),size,700)).join('')}
-  ${card.amount?text(card.amount,64,420,card.amount==='Unavailable'?80:112,700,'#805600'):''}
-  ${text(card.metric,64,card.amount?469:380,28)}
-  ${text(card.scope+(card.period?' · '+card.period:''),64,card.amount?519:440,25,400,'#555555')}
+  ${card.amount?text(card.amount,64,amountY,amountSize,700,'#805600'):''}
+  ${text(card.metric,64,card.amount?amountY+49:380,28)}
+  ${text(card.scope+(card.period?' · '+card.period:''),64,card.amount?amountY+99:440,25,400,'#555555')}
   <path d="M64 558H1136" stroke="#ddddda"/>
   ${text('auwelfaredata.wlsn.me',64,598,24,700)}
   </g></svg>`;
