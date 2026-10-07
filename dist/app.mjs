@@ -1,5 +1,5 @@
 import { buildSummary, formatAUD, formatCount, formatSourceDate, formatRecipientRate, recipientMetrics } from './lib/model.mjs';
-import { searchAreas, resolveAreaUrl } from './lib/search.mjs';
+import { searchAreas, searchSuggestions, resolveAreaUrl } from './lib/search.mjs';
 import { documentContent, areaLink, exportFilename } from './lib/render.mjs';
 import { previewGraphic, exportGraphic, saveBlob } from './lib/download.mjs';
 import {buildRankings} from './lib/rankings.mjs';
@@ -7,7 +7,8 @@ import {buildRankings} from './lib/rankings.mjs';
 const canonicalOrigin='https://benefits-data-australia.vvlsn.chatgpt.site';
 const $=id=>document.getElementById(id);
 const escape=text=>String(text??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let release,selected,summary,style='receipt',matches=[],filter='all',previewVersion=0,exporting=false,downloadUrl;
+let release,selected,summary,style='receipt',matches=[],previewVersion=0,exporting=false,downloadUrl;
+let postcodes=[],activeSuggestion=-1;
 let rankings,rankingType='ced',rankingPage=0;
 let rankingMetric='spending';
 const recipientRankings=new Map();
@@ -29,6 +30,7 @@ async function loadData(current=false) {
     const response=await fetch(`/data/releases/${version}.json`);
     if(!response.ok) throw new Error('That data release could not be loaded. Load current data or try again.');
     release=await response.json();
+    postcodes=[...new Set(release.areas.flatMap(area=>area.postcodes))].sort();
     rankings={ced:buildRankings(release,'ced'),lga:buildRankings(release,'lga')};
     recipientRankings.clear();
     $('ranking-metric').innerHTML='<option value="spending">Total annual spending</option>'+[['people','Percentage of residents'],['families','Families / income units per 1,000 residents']].map(([unit,label])=>`<optgroup label="${label}">${recipientMetrics.filter(metric=>unit==='people'?['people','participants'].includes(metric.unit):['families','income-units'].includes(metric.unit)).map(metric=>`<option value="${metric.id}">${escape(metric.label)}</option>`).join('')}</optgroup>`).join('');
@@ -49,25 +51,59 @@ async function loadData(current=false) {
     else if(parameters.get('area')&&!current) status('search-status','That area is not available in this release. Search for its name or postcode.',true);
   } catch(error) {status('search-status',error.message||'Area data could not be loaded. Try again.',true);$('retry').hidden=false;$('rankings-loading').textContent='Spending rankings are unavailable until the area data loads. Use “Load current data” above to retry.';}
 }
-function renderMatches() {
-  const results=filter==='all'?matches:matches.filter(a=>a.type===filter);
-  $('results').hidden=false;
-  $('result-count').textContent=`${results.length} ${results.length===1?'match':'matches'}`;
-  $('area-results').innerHTML=results.slice(0,40).map(a=>`<li><button type="button" data-area="${escape(a.id)}"><span><span class="result-name">${escape(a.name)}</span><span class="result-kind">${a.type==='ced'?'Federal electorate':'Council area'} · ${escape(a.state)}</span></span><span class="result-chevron" aria-hidden="true">›</span></button></li>`).join('');
-  if(!results.length) status('search-status',matches.length?'No matches in this area type. Choose All areas or try another search.':'No matching area. Try an electorate or council name. Some PO Box postcodes are not represented by ABS Postal Areas.');
-  else status('search-status',results.length>40?'Showing the first 40 matches. Add a state or more of the area name to narrow the search.':`Choose ${results.length===1?'the area':'an area'} below.`);
+function closeSuggestions() {
+  const wasOpen=!$('results').hidden;
+  $('results').hidden=true;$('area-search').setAttribute('aria-expanded','false');
+  $('area-search').removeAttribute('aria-activedescendant');activeSuggestion=-1;
+  $('search-status').classList.remove('visually-hidden');if(wasOpen)status('search-status','');
+}
+function positionSuggestions(ensureVisible=false) {
+  if($('results').hidden)return;
+  const viewport=window.visualViewport;
+  const viewportBottom=(viewport?.offsetTop??0)+(viewport?.height??window.innerHeight);
+  let space=viewportBottom-$('search-control').getBoundingClientRect().bottom-8;
+  if(ensureVisible&&document.activeElement===$('area-search')&&space<140){
+    $('search-control').scrollIntoView({block:'start',behavior:'instant'});
+    space=viewportBottom-$('search-control').getBoundingClientRect().bottom-8;
+  }
+  $('results').style.maxHeight=`${Math.max(96,Math.min(320,space))}px`;
+}
+function renderMatches(query,message='') {
+  activeSuggestion=-1;$('area-search').removeAttribute('aria-activedescendant');
+  $('results').hidden=false;$('area-search').setAttribute('aria-expanded','true');
+  $('results-heading').textContent=/^\d{4}$/.test(query)?`Areas for postcode ${query}`:/^\d{2,3}$/.test(query)?'Postcode suggestions':'Matching areas';
+  $('result-count').textContent=`${matches.length} ${matches.length===1?'match':'matches'}`;
+  $('area-results').innerHTML=matches.slice(0,40).map((a,i)=>`<li id="search-option-${i}" role="option" aria-selected="false" data-search-index="${i}"><span class="result-copy"><span class="result-name">${escape(a.name)}</span><span class="result-kind">${a.type==='postcode'?'Choose to see divisions and LGAs':`${escape(a.state)}${a.postcode?` · Postcode ${escape(a.postcode)}`:''}`}</span></span><span class="result-badge">${a.type==='postcode'?'Postcode':a.type==='ced'?'Division':'LGA'}</span></li>`).join('');
+  const note=message||(!matches.length?'No matches. Try a division or LGA name; PO Box-only postcodes may not be represented.':matches.length>40?'Showing the first 40 matches. Keep typing to narrow the results.':'');
+  $('results-message').hidden=!note;$('results-message').textContent=note;
+  status('search-status',note||`${matches.length} suggestions available. Use the arrow keys or select a result.`);
+  $('search-status').classList.add('visually-hidden');positionSuggestions(true);
 }
 function search() {
   if(!release) return;
   const query=$('area-search').value.trim();
-  if(!query) {$('results').hidden=true;status('search-status','Enter a four-digit postcode or an electorate/council name.');return;}
-  if(/^\d+$/.test(query)&&query.length!==4) {$('results').hidden=true;status('search-status','Enter a four-digit Australian postcode, including any leading zero.');return;}
-  matches=searchAreas(query,release.areas);renderMatches();
+  matches=searchSuggestions(query,release.areas,postcodes);
+  const message=query.length<2?'Enter at least two characters to search.':/^\d{5,}$/.test(query)?'Use a four-digit Australian postcode, including any leading zero.':'';
+  renderMatches(query,message);
+}
+function highlightSuggestion(index) {
+  const options=[...$('area-results').children];
+  if(!options.length)return;
+  activeSuggestion=Math.max(0,Math.min(index,options.length-1));
+  options.forEach((option,i)=>option.setAttribute('aria-selected',String(i===activeSuggestion)));
+  $('area-search').setAttribute('aria-activedescendant',options[activeSuggestion].id);
+  options[activeSuggestion].scrollIntoView({block:'nearest',behavior:'instant'});
+}
+async function chooseSuggestion(index) {
+  const result=matches[index];if(!result)return;
+  if(result.type==='postcode'){$('area-search').value=result.name;$('area-search').focus();search();return;}
+  $('area-search').blur();
+  await selectArea(release.areas.find(area=>area.id===result.id));
 }
 async function selectArea(area,moveFocus=true,fromRanking=false) {
   clearDownload();
   selected=area;summary=buildSummary(area,release);
-  $('results').hidden=true;status('search-status','');
+  closeSuggestions();
   $('area-search').value=area.name;
   $('area-summary').hidden=false;
   $('area-name').textContent=area.name;
@@ -169,10 +205,26 @@ function renderRankings() {
 }
 window.addEventListener('pagehide',clearDownload);
 $('search-form').addEventListener('submit',event=>{event.preventDefault();search();});
-$('area-search').addEventListener('input',()=>{if(release&&$('area-search').value.trim().length>=2)search();else{$('results').hidden=true;status('search-status','');}});
-for(const button of document.querySelectorAll('[data-query]'))button.addEventListener('click',()=>{$('area-search').value=button.dataset.query;search();});
-for(const button of document.querySelectorAll('[data-filter]'))button.addEventListener('click',()=>{filter=button.dataset.filter;for(const b of document.querySelectorAll('[data-filter]'))b.setAttribute('aria-pressed',String(b===button));renderMatches();});
-$('area-results').addEventListener('click',event=>{const button=event.target.closest('[data-area]');if(button)selectArea(release.areas.find(a=>a.id===button.dataset.area));});
+$('search-form').addEventListener('focusout',event=>{if(!$('search-form').contains(event.relatedTarget))closeSuggestions();});
+$('area-search').addEventListener('input',event=>{if(event.isComposing)return;if(release&&$('area-search').value.trim().length>=2)search();else closeSuggestions();});
+$('area-search').addEventListener('focus',()=>{if(release&&$('area-search').value.trim().length>=2)search();});
+$('area-search').addEventListener('keydown',event=>{
+  if(event.isComposing)return;
+  if(event.key==='ArrowDown'||event.key==='ArrowUp'){
+    event.preventDefault();if($('results').hidden)search();
+    highlightSuggestion(event.key==='ArrowDown'?activeSuggestion+1:activeSuggestion<0?Math.min(matches.length,40)-1:activeSuggestion-1);
+  }else if(event.key==='Enter'&&!$('results').hidden&&activeSuggestion>=0){event.preventDefault();chooseSuggestion(activeSuggestion);}
+  else if(event.key==='Escape'){event.preventDefault();closeSuggestions();}
+  else if(event.key==='Tab')closeSuggestions();
+});
+for(const button of document.querySelectorAll('[data-query]'))button.addEventListener('click',()=>{$('area-search').value=button.dataset.query;$('area-search').focus();search();});
+$('area-results').addEventListener('pointerdown',event=>event.preventDefault());
+$('area-results').addEventListener('click',event=>{const option=event.target.closest('[data-search-index]');if(option)chooseSuggestion(Number(option.dataset.searchIndex));});
+document.addEventListener('pointerdown',event=>{if(!$('search-form').contains(event.target))closeSuggestions();});
+window.addEventListener('resize',()=>positionSuggestions(true));
+window.addEventListener('scroll',()=>positionSuggestions(),{passive:true});
+window.visualViewport?.addEventListener('resize',()=>positionSuggestions(true));
+window.visualViewport?.addEventListener('scroll',()=>positionSuggestions(),{passive:true});
 $('change-area').addEventListener('click',()=>{$('area-search').focus();$('area-search').select();});
 for(const button of document.querySelectorAll('[data-style]'))button.addEventListener('click',()=>setStyle(button.dataset.style));
 $('download-png').addEventListener('click',()=>download('png'));

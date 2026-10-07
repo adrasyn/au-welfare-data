@@ -29,18 +29,16 @@
         <section class="search-section" aria-labelledby="search-heading">
           <h2 id="search-heading">Find your area</h2>
           <form id="search-form" role="search">
-            <label for="area-search">Postcode, federal electorate or council area</label>
-            <div class="search-control"><svg width="21" height="21" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 5 5" stroke="currentColor" stroke-width="1.7"/></svg><input id="area-search" name="area" type="search" placeholder="e.g. 2000 or Sydney" autocomplete="off" aria-describedby="search-help search-status" disabled><button class="primary search-button" id="search-button" type="submit" disabled>Search</button></div>
+            <label for="area-search">Postcode, division or LGA</label>
+            <div id="search-anchor" class="search-dropdown-anchor">
+              <div id="search-control" class="search-control"><svg width="21" height="21" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 5 5" stroke="currentColor" stroke-width="1.7"/></svg><input id="area-search" name="area" type="search" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="area-results" placeholder="e.g. 2000 or Sydney" autocomplete="off" aria-describedby="search-help search-status" disabled><button class="primary search-button" id="search-button" type="submit" disabled>Search</button></div>
+              <div id="results" class="search-dropdown" tabindex="-1" hidden><div class="search-menu-heading"><span id="results-heading">Matching areas</span><span id="result-count"></span></div><ul id="area-results" class="area-results" role="listbox" aria-label="Search suggestions"></ul><p id="results-message" class="search-menu-note" hidden></p></div>
+            </div>
             <p id="search-help" class="help">A postcode can cover more than one area. Choose the one you want.</p>
           </form>
           <div class="examples"><span>Try an area:</span><button type="button" data-query="2000">2000</button><button type="button" data-query="Melbourne">Melbourne</button><button type="button" data-query="Brisbane">Brisbane</button></div>
           <p id="search-status" class="status" role="status" aria-live="polite">Loading area data…</p>
           <button id="retry" class="secondary" type="button" hidden>Load current data</button>
-          <div id="results" hidden>
-            <div class="result-toolbar"><h3>Choose an area</h3><span id="result-count"></span></div>
-            <div class="filters" aria-label="Filter search results"><button type="button" data-filter="all" aria-pressed="true">All areas</button><button type="button" data-filter="ced" aria-pressed="false">Electorates</button><button type="button" data-filter="lga" aria-pressed="false">Councils</button></div>
-            <ul id="area-results" class="area-results"></ul>
-          </div>
         </section>
         <section id="area-summary" class="area-summary" aria-labelledby="area-name" hidden>
           <div class="area-heading"><div><p id="area-type" class="area-type"></p><h2 id="area-name" tabindex="-1"></h2><p id="area-population" class="help"></p></div><button id="change-area" type="button" class="text-button">Change area</button></div>
