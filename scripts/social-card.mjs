@@ -65,7 +65,7 @@ export function socialSvg(card) {
   ${text('Welfare Data Australia',64,80,30,700)}
   ${text(card.geography,64,130,24,400,'#555555')}
   ${lines.map((line,i)=>text(line,64,228+i*(size*1.1),size,700)).join('')}
-  ${card.amount?text(card.amount,64,amountY,amountSize,700,'#805600'):''}
+  ${card.amount?text(card.amount,64,amountY-6,amountSize,700,'#805600'):''}
   ${text(card.metric,64,card.amount?amountY+49:380,28)}
   ${text(card.scope+(card.period?' · '+card.period:''),64,card.amount?amountY+99:440,25,400,'#555555')}
   <path d="M64 558H1136" stroke="#ddddda"/>
